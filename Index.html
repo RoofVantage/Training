@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoofVantage — Sales Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* RoofVantage Brand Palette */
+  --navy:    #003865;
+  --navy2:   #002850;
+  --navy3:   #001e3a;
+  --navy4:   #00508a;
+  --navy5:   #006A8E;
+  /* Orange — primary action */
+  --gold:    #D38328;
+  --gold2:   #ED8800;
+  --gold3:   #f5a030;
+  --gold-dim:  rgba(237,136,0,0.10);
+  --gold-glow: rgba(237,136,0,0.25);
+  /* Borders */
+  --border:   rgba(0,0,0,0.09);
+  --border2:  rgba(0,0,0,0.16);
+  --hdr-border: rgba(255,255,255,0.12);
+  /* Teal — info / coaching */
+  --teal:     #007FA3;
+  --teal2:    #006A8E;
+  --teal-dim: rgba(0,127,163,0.08);
+  /* Light theme work area */
+  --bg:       #f5f6f8;
+  --surface:  #ffffff;
+  --sidebar:  #f0f2f5;
+  --card:     #ffffff;
+  --card2:    #f8f9fb;
+  /* Text */
+  --text:     #1a2540;
+  --text2:    #3d4f6e;
+  --muted:    #7a8aaa;
+  /* Semantic */
+  --green:      #1a9e6a;
+  --green-dim:  rgba(26,158,106,0.08);
+  --red:        #d94040;
+  --red-dim:    rgba(217,64,64,0.08);
+  --blue:       #007FA3;
+  --blue-dim:   rgba(0,127,163,0.08);
+  --amber:      #c47a00;
+  --amber-dim:  rgba(196,122,0,0.09);
+  --purple:     #5b6fa8;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;
+  line-height:1.65;
+  display:flex;flex-direction:column;height:100vh;
+}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#d0d4de;border-radius:4px;}
+
+/* ── HEADER (stays navy) ── */
+.hdr{
+  background:var(--navy);
+  border-bottom:1px solid var(--hdr-border);
+  height:58px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;flex-shrink:0;position:relative;z-index:50;
+}
+.hdr::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold2),transparent);
+  opacity:0.5;
+}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:36px;height:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.logo-text{}
+.logo-name{
+  font-family:'Barlow',sans-serif;font-size:20px;font-weight:800;
+  color:#ffffff;letter-spacing:0.5px;line-height:1.1;
+}
+.logo-sub{font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:1.5px;text-transform:uppercase;}
+
+.tabs{
+  display:flex;gap:2px;
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--hdr-border);
+  border-radius:10px;padding:3px;
+}
+.tab-btn{
+  padding:7px 22px;border-radius:8px;border:none;
+  background:transparent;color:rgba(255,255,255,0.5);
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:7px;
+}
+.tab-btn:hover{color:rgba(255,255,255,0.85);}
+.tab-btn.active{background:rgba(255,255,255,0.12);color:#ffffff;border:1px solid var(--hdr-border);}
+
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.progress-pill{
+  background:rgba(237,136,0,0.18);border:1px solid rgba(237,136,0,0.4);
+  color:#f5a030;font-size:11px;padding:4px 12px;border-radius:99px;font-weight:500;
+}
+
+/* ── PROGRESS LINE ── */
+.prog-line{height:3px;background:#dde0e8;flex-shrink:0;}
+.prog-line-inner{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width 0.4s;}
+
+/* ── BODY ── */
+.app-body{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.tab-panel{display:none;height:100%;overflow:hidden;}
+.tab-panel.active{display:flex;flex-direction:column;}
+
+/* ════════ LEARN ════════ */
+.learn-wrap{display:grid;grid-template-columns:250px 1fr;height:100%;overflow:hidden;}
+
+.learn-nav{
+  background:var(--sidebar);
+  border-right:1px solid var(--border);
+  overflow-y:auto;padding:16px 0;
+}
+.nav-group-lbl{
+  font-size:9px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--muted);padding:0 16px 10px;
+}
+.lnav{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 16px;cursor:pointer;transition:all 0.15s;
+  border-left:2px solid transparent;font-size:12px;color:var(--muted);
+}
+.lnav:hover{background:rgba(0,0,0,0.04);color:var(--text2);}
+.lnav.active{background:rgba(237,136,0,0.07);border-left-color:var(--gold2);color:var(--gold);font-weight:600;}
+.lnav.done{color:var(--green);}
+.lnav.done .lnav-dot{background:var(--green);}
+.lnav-dot{width:6px;height:6px;border-radius:50%;background:#ced2dc;flex-shrink:0;transition:0.2s;}
+.lnav.active .lnav-dot{background:var(--gold2);}
+.lnav-num{font-size:10px;color:var(--muted);min-width:18px;}
+
+.learn-main{overflow-y:auto;padding:36px 44px;background:var(--surface);}
+.l-sec{display:none;animation:fadeUp 0.25s ease;}
+.l-sec.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.sec-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--gold-dim);border:1px solid var(--gold-glow);
+  border-radius:99px;padding:3px 12px;
+  font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);
+  margin-bottom:12px;
+}
+.sec-title{
+  font-family:'Barlow',sans-serif;font-size:34px;font-weight:800;
+  color:var(--navy);margin-bottom:6px;line-height:1.15;
+}
+.sec-sub{color:var(--muted);font-size:13px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+
+.obj-box{
+  background:var(--blue-dim);border:1px solid rgba(0,127,163,0.18);
+  border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;gap:10px;
+}
+.obj-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.obj-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:3px;}
+.obj-txt{font-size:13px;color:var(--text2);}
+
+.reveal-btn{
+  background:var(--gold-dim);border:1px solid var(--gold-glow);
+  color:var(--gold);padding:6px 14px;border-radius:7px;
+  font-size:11px;cursor:pointer;margin-bottom:12px;transition:0.2s;font-family:'DM Sans',sans-serif;
+}
+.reveal-btn:hover{background:rgba(237,136,0,0.16);}
+
+.lines{display:flex;flex-direction:column;gap:7px;margin-bottom:20px;}
+.lcard{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:12px 16px;
+  cursor:pointer;transition:0.2s;border-left:2px solid #dde0e8;
+}
+.lcard:hover{border-color:#c0c6d4;}
+.lcard.revealed{border-left-color:var(--gold2);}
+.ltag{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
+.t-say{color:var(--gold);}  .t-think{color:var(--blue);}  .t-ask{color:var(--green);}
+.t-close{color:var(--red);} .t-objection{color:var(--purple);}
+.ltext{font-size:14px;line-height:1.6;color:var(--text);}
+.ltext.blur{filter:blur(5px);user-select:none;transition:filter 0.3s;}
+.lhint{font-size:11px;color:var(--muted);margin-top:4px;font-style:italic;}
+
+.kp-box{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:20px;}
+.kp-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.kp{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);}
+.kp:last-child{border-bottom:none;}
+.kp-dot{color:var(--gold2);flex-shrink:0;font-weight:700;}
+
+.quiz-block{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:14px;}
+.quiz-q{font-size:14px;font-weight:500;margin-bottom:14px;color:var(--text);}
+.quiz-opts{display:flex;flex-direction:column;gap:7px;}
+.quiz-opt{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:7px;padding:10px 14px;cursor:pointer;
+  font-size:13px;transition:0.2s;font-family:'DM Sans',sans-serif;
+  color:var(--text2);text-align:left;
+}
+.quiz-opt:hover{border-color:var(--gold2);color:var(--text);}
+.quiz-opt.correct{border-color:var(--green);background:var(--green-dim);color:var(--green);}
+.quiz-opt.wrong{border-color:var(--red);background:var(--red-dim);color:var(--red);}
+.quiz-fb{margin-top:10px;font-size:12px;padding:8px 12px;border-radius:7px;display:none;}
+.quiz-fb.show{display:block;}
+.quiz-fb.good{background:var(--green-dim);color:var(--green);border:1px solid rgba(26,158,106,0.2);}
+.quiz-fb.bad{background:var(--red-dim);color:var(--red);border:1px solid rgba(217,64,64,0.2);}
+
+.sec-nav{display:flex;gap:10px;margin-top:28px;padding-top:20px;border-top:1px solid var(--border);}
+.btn-gold{
+  background:var(--gold2);color:#fff;border:none;
+  padding:10px 24px;border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;transition:0.2s;
+}
+.btn-gold:hover{background:var(--gold3);transform:translateY(-1px);}
+.btn-ghost{
+  background:transparent;color:var(--muted);
+  border:1px solid var(--border2);padding:10px 18px;
+  border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:0.2s;
+}
+.btn-ghost:hover{color:var(--text);border-color:#a0a8bc;}
+hr.div{border:none;border-top:1px solid var(--border);margin:18px 0;}
+
+/* ════════ PRACTICE ════════ */
+.practice-wrap{display:grid;grid-template-columns:1fr 1fr;height:100%;overflow:hidden;}
+.prac-script{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--surface);}
+.panel-hdr{
+  background:var(--navy);border-bottom:1px solid var(--hdr-border);
+  padding:11px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.panel-hdr-title{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.55);}
+.panel-hdr-title span{color:#fff;}
+.pnav-btns{display:flex;gap:5px;}
+.pnav-btn{
+  background:rgba(255,255,255,0.1);border:1px solid var(--hdr-border);
+  color:rgba(255,255,255,0.7);padding:5px 11px;border-radius:6px;
+  font-size:11px;cursor:pointer;transition:0.2s;font-family:'DM Sans',sans-serif;
+}
+.pnav-btn:hover{color:#fff;background:rgba(255,255,255,0.18);}
+.prac-script-body{flex:1;overflow-y:auto;padding:18px;background:var(--surface);}
+.p-sec{display:none;}
+.p-sec.active{display:block;}
+.p-sec-title{font-family:'Barlow',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px;color:var(--navy);}
+.p-sec-sub{font-size:12px;color:var(--muted);margin-bottom:12px;}
+.p-line{padding:8px 12px;border-radius:6px;margin-bottom:5px;font-size:13px;line-height:1.6;border-left:2px solid;color:var(--text2);}
+.p-say{background:rgba(237,136,0,0.06);border-color:var(--gold2);}
+.p-ask{background:var(--green-dim);border-color:var(--green);}
+.p-think{background:var(--blue-dim);border-color:var(--blue);font-style:italic;color:var(--muted);}
+.p-close{background:var(--red-dim);border-color:var(--red);}
+.p-objection{background:rgba(91,111,168,0.07);border-color:var(--purple);}
+.p-line-lbl{font-size:9px;letter-spacing:1px;text-transform:uppercase;opacity:0.6;margin-bottom:2px;}
+
+/* AI CHAT */
+.prac-chat{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+
+.msg-cust{max-width:85%;align-self:flex-start;}
+.msg-rep{max-width:85%;align-self:flex-end;}
+.msg-sys{align-self:center;max-width:92%;}
+.msg-lbl{font-size:10px;color:var(--muted);margin-bottom:4px;}
+.msg-rep .msg-lbl{text-align:right;}
+.bubble{padding:11px 15px;border-radius:12px;font-size:13px;line-height:1.6;}
+.msg-cust .bubble{background:#fff;border:1px solid var(--border);border-bottom-left-radius:3px;color:var(--text);}
+.msg-rep .bubble{background:var(--navy);color:#fff;border-bottom-right-radius:3px;}
+.msg-sys .bubble{border-radius:8px;font-size:12px;text-align:center;}
+
+/* EXCHANGE SCORE — bigger, easier to read */
+.exchange-score{
+  align-self:stretch;background:#fff;border:1px solid var(--border);
+  border-left:3px solid var(--gold2);
+  border-radius:10px;padding:14px 18px;margin:4px 0;animation:fadeUp 0.3s ease;
+}
+.es-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.es-grade{font-family:'Barlow',sans-serif;font-size:32px;font-weight:800;line-height:1;}
+.grade-a{color:var(--green);}  .grade-b{color:var(--gold2);}
+.grade-c{color:var(--amber);}  .grade-d,.grade-f{color:var(--red);}
+.es-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+.es-points{font-size:20px;font-weight:700;color:var(--text2);}
+.es-tip{font-size:14px;font-weight:500;color:var(--text);line-height:1.65;}
+.es-stage{font-size:11px;font-weight:600;color:var(--muted);margin-top:8px;border-top:1px solid var(--border);padding-top:7px;}
+
+.chat-input-area{border-top:1px solid var(--border);padding:12px 16px;flex-shrink:0;background:#fff;}
+.chat-row{display:flex;gap:7px;align-items:flex-end;}
+.chat-ta{
+  flex:1;background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:9px 13px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:13px;
+  resize:none;min-height:40px;max-height:100px;
+  line-height:1.5;transition:border-color 0.2s;
+}
+.chat-ta:focus{outline:none;border-color:var(--navy4);}
+.chat-ta::placeholder{color:var(--muted);}
+.btn-send{
+  background:var(--gold2);color:#fff;border:none;
+  width:38px;height:38px;border-radius:8px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:0.2s;flex-shrink:0;
+}
+.btn-send:hover{background:var(--gold3);}
+.btn-send:disabled{opacity:0.3;cursor:default;}
+.btn-mic{
+  background:var(--bg);border:1px solid var(--border);
+  color:var(--muted);width:38px;height:38px;border-radius:8px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:0.2s;flex-shrink:0;
+}
+.btn-mic:hover{border-color:var(--gold2);color:var(--gold2);}
+.btn-mic.listening{background:var(--red-dim);border-color:var(--red);color:var(--red);animation:pulse 1s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.55;}}
+
+.dots{display:flex;gap:4px;align-items:center;}
+.dots span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:dotb 1.2s ease-in-out infinite;}
+.dots span:nth-child(2){animation-delay:0.2s;}
+.dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes dotb{0%,80%,100%{transform:scale(0.6);opacity:0.4;}40%{transform:scale(1);opacity:1;}}
+
+/* ════════ SIMULATE ════════ */
+.sim-setup{flex:1;overflow-y:auto;padding:40px;background:var(--bg);display:flex;flex-direction:column;align-items:center;gap:28px;}
+.sim-hero{text-align:center;}
+.sim-hero h2{
+  font-family:'Barlow',sans-serif;font-size:52px;font-weight:800;
+  color:var(--navy);line-height:1.1;margin-bottom:10px;
+}
+.sim-hero p{color:var(--muted);font-size:15px;}
+
+.sim-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;width:100%;max-width:1000px;}
+.sim-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;}
+.sim-card-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.sim-opt{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 11px;border-radius:8px;border:1px solid var(--border);
+  margin-bottom:5px;cursor:pointer;transition:0.2s;font-size:12px;color:var(--text2);
+}
+.sim-opt:hover{border-color:#a0a8bc;background:var(--bg);}
+.sim-opt.sel{border-color:var(--gold2);background:var(--gold-dim);color:var(--gold);}
+.sim-radio{
+  width:15px;height:15px;border-radius:50%;border:2px solid #cdd1db;
+  flex-shrink:0;transition:0.2s;display:flex;align-items:center;justify-content:center;
+}
+.sim-opt.sel .sim-radio{border-color:var(--gold2);background:var(--gold2);}
+.sim-opt.sel .sim-radio::after{content:'';width:5px;height:5px;background:#fff;border-radius:50%;}
+.sim-icon{font-size:15px;}
+
+.btn-start{
+  background:var(--navy);color:#fff;border:none;
+  padding:16px 52px;border-radius:10px;
+  font-family:'Barlow',sans-serif;font-size:22px;font-weight:700;
+  cursor:pointer;transition:0.2s;letter-spacing:0.5px;
+}
+.btn-start:hover{background:var(--navy2);transform:translateY(-1px);}
+.btn-start:disabled{opacity:0.4;cursor:default;transform:none;}
+
+/* ACTIVE SIM */
+.sim-active{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.sim-active.on{display:flex;}
+
+.sim-topbar{
+  background:var(--navy);border-bottom:1px solid var(--hdr-border);
+  padding:10px 20px;display:flex;align-items:center;
+  justify-content:space-between;flex-shrink:0;
+}
+.sim-badges{display:flex;gap:8px;align-items:center;}
+.sbadge{font-size:10px;padding:3px 10px;border-radius:99px;letter-spacing:1px;text-transform:uppercase;}
+.sb-scenario{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;}
+.sb-easy{background:rgba(26,158,106,0.2);border:1px solid rgba(26,158,106,0.4);color:#4fd4a0;}
+.sb-realistic{background:rgba(237,136,0,0.2);border:1px solid rgba(237,136,0,0.4);color:#f5a030;}
+.sb-hard{background:rgba(217,64,64,0.2);border:1px solid rgba(217,64,64,0.4);color:#f07070;}
+
+.sim-stats{display:flex;gap:20px;}
+.sstat-val{font-family:'Barlow',sans-serif;font-size:20px;font-weight:700;color:#fff;text-align:center;}
+.sstat-lbl{font-size:9px;color:rgba(255,255,255,0.45);letter-spacing:1px;text-transform:uppercase;text-align:center;}
+
+.btn-end{
+  background:rgba(217,64,64,0.15);border:1px solid rgba(217,64,64,0.4);
+  color:#f07070;padding:6px 14px;border-radius:6px;
+  font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.2s;
+}
+.btn-end:hover{background:rgba(217,64,64,0.25);}
+
+.sim-body{flex:1;display:flex;overflow:hidden;}
+.sim-chat{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border);}
+.sim-msgs{flex:1;overflow-y:auto;padding:18px;background:var(--bg);display:flex;flex-direction:column;gap:10px;}
+.sim-input{border-top:1px solid var(--border);padding:14px 18px;flex-shrink:0;background:#fff;}
+.sim-row{display:flex;gap:8px;align-items:flex-end;}
+
+/* COACHING SIDEBAR */
+.coaching-col{
+  width:290px;display:flex;flex-direction:column;
+  overflow:hidden;background:#fff;border-left:1px solid var(--border);
+}
+.coaching-hdr{
+  background:var(--navy);padding:12px 16px;border-bottom:1px solid var(--hdr-border);
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,0.85);flex-shrink:0;
+}
+.coaching-feed{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px;}
+
+/* COACHING ITEMS — bullet-point style */
+.c-item{
+  background:#fff;border:1px solid var(--border);
+  border-radius:8px;padding:10px 12px;font-size:12px;
+  animation:fadeUp 0.3s ease;
+}
+.c-item.good{border-left:3px solid var(--green);background:var(--green-dim);}
+.c-item.warn{border-left:3px solid var(--amber);background:var(--amber-dim);}
+.c-item.bad{border-left:3px solid var(--red);background:var(--red-dim);}
+.c-item.tip{border-left:3px solid var(--blue);background:var(--blue-dim);}
+.c-lbl{font-size:9px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-weight:600;}
+.c-lbl.good{color:var(--green);} .c-lbl.warn{color:var(--amber);}
+.c-lbl.bad{color:var(--red);} .c-lbl.tip{color:var(--blue);}
+.c-bullets{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;}
+.c-bullet{
+  display:flex;gap:6px;align-items:flex-start;
+  font-size:12px;color:var(--text2);line-height:1.5;
+}
+.c-bullet::before{
+  content:'•';font-size:14px;flex-shrink:0;margin-top:-1px;
+}
+.c-item.good .c-bullet::before{color:var(--green);}
+.c-item.warn .c-bullet::before{color:var(--amber);}
+.c-item.bad  .c-bullet::before{color:var(--red);}
+.c-item.tip  .c-bullet::before{color:var(--blue);}
+.c-stage-tag{
+  display:inline-block;font-size:9px;
+  background:rgba(0,0,0,0.06);
+  border-radius:4px;padding:1px 6px;
+  color:var(--muted);margin-top:5px;
+}
+
+.stage-panel{border-top:1px solid var(--border);padding:12px;flex-shrink:0;background:#fff;}
+.stage-ttl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.stage-it{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:11px;color:var(--muted);}
+.stage-dot{width:5px;height:5px;border-radius:50%;background:#dde0e8;flex-shrink:0;}
+.stage-it.done{color:var(--green);}
+.stage-it.done .stage-dot{background:var(--green);}
+.stage-it.cur{color:var(--navy);font-weight:600;}
+.stage-it.cur .stage-dot{background:var(--gold2);}
+
+/* SCORECARD */
+.sc-overlay{position:fixed;inset:0;background:rgba(0,30,60,0.6);z-index:200;display:none;align-items:center;justify-content:center;}
+.sc-overlay.show{display:flex;}
+.sc-modal{
+  background:#fff;border:1px solid var(--border);
+  border-radius:16px;padding:36px;width:580px;
+  max-height:88vh;overflow-y:auto;animation:fadeUp 0.3s ease;
+}
+.sc-title{
+  font-family:'Barlow',sans-serif;font-size:36px;font-weight:800;text-align:center;
+  color:var(--navy);margin-bottom:4px;
+}
+.sc-sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:24px;}
+.sc-score{
+  font-family:'Barlow',sans-serif;font-size:88px;font-weight:800;
+  line-height:1;text-align:center;margin-bottom:4px;
+}
+.sc-grade-lbl{text-align:center;color:var(--muted);font-size:13px;margin-bottom:26px;}
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.sc-stat{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.sc-stat-lbl{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.sc-stat-val{font-size:18px;font-weight:600;color:var(--text);}
+.sc-stat-val.g{color:var(--green);} .sc-stat-val.w{color:var(--amber);} .sc-stat-val.b{color:var(--red);}
+.sc-fb-ttl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.sc-fb-item{padding:8px 12px;border-radius:7px;margin-bottom:6px;font-size:13px;}
+.sc-fb-item.pos{background:var(--green-dim);border:1px solid rgba(26,158,106,0.2);color:var(--text2);}
+.sc-fb-item.neg{background:var(--red-dim);border:1px solid rgba(217,64,64,0.2);color:var(--text2);}
+.sc-actions{display:flex;gap:10px;justify-content:center;margin-top:4px;}
+
+/* API KEY MODAL */
+.apikey-overlay{position:fixed;inset:0;background:rgba(0,30,60,0.7);z-index:500;display:none;align-items:center;justify-content:center;}
+.apikey-overlay.show{display:flex;}
+.apikey-modal{
+  background:#fff;border-radius:16px;padding:36px;width:480px;
+  box-shadow:0 20px 60px rgba(0,30,60,0.2);animation:fadeUp 0.3s ease;
+}
+.apikey-title{font-family:'Barlow',sans-serif;font-size:26px;font-weight:800;color:var(--navy);margin-bottom:6px;}
+.apikey-sub{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.6;}
+.apikey-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.apikey-input{
+  width:100%;background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:11px 14px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:13px;
+  margin-bottom:6px;transition:border-color 0.2s;
+}
+.apikey-input:focus{outline:none;border-color:var(--navy4);}
+.apikey-help{font-size:11px;color:var(--muted);margin-bottom:20px;}
+.apikey-help a{color:var(--blue);text-decoration:none;}
+.apikey-actions{display:flex;gap:10px;}
+.apikey-remember{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:16px;cursor:pointer;}
+.apikey-remember input{cursor:pointer;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:40px;color:var(--muted);}
+.empty-icon{font-size:36px;margin-bottom:10px;}
+.empty-txt{font-size:14px;}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:20px;right:20px;
+  background:var(--navy);color:#fff;border-radius:8px;
+  padding:10px 16px;font-size:13px;
+  z-index:300;animation:slideIn 0.3s ease;display:none;
+}
+.toast.on{display:block;}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* STAGE DIRECTION in chat bubbles */
+.stage-dir{font-style:italic;color:var(--muted);font-size:12px;}
+
+/* SPEAKING INDICATOR */
+.speaking-indicator{
+  display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  background:var(--blue-dim);border:1px solid rgba(0,127,163,0.2);
+  color:var(--blue);font-size:11px;animation:fadeUp 0.3s ease;
+}
+.speaking-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulse 0.8s ease-in-out infinite;}
+.tts-on-btn{background:var(--blue-dim)!important;border-color:var(--blue)!important;color:var(--blue)!important;}
+
+/* TTS TOGGLE BUTTONS in topbar */
+.tts-toggle-btn{
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  color:rgba(255,255,255,0.6);padding:6px 10px;border-radius:6px;
+  font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:0.2s;white-space:nowrap;
+}
+.tts-toggle-btn:hover{color:#fff;background:rgba(255,255,255,0.18);}
+.tts-toggle-btn.tts-on{background:rgba(0,127,163,0.25)!important;border-color:rgba(0,127,163,0.5)!important;color:#7fd4f0!important;}
+
+/* BIGGER CHAT BUBBLES — paragraph style, bold first sentence */
+.bubble{padding:13px 16px;border-radius:12px;font-size:15px;font-weight:400;line-height:1.7;}
+.bubble .b-first{font-weight:700;display:block;margin-bottom:3px;}
+.bubble .b-rest{font-weight:400;display:block;}
+
+/* BIGGER COACHING */
+.coaching-col{width:360px;}
+.c-item{padding:12px 14px;}
+.c-lbl{font-size:10px;margin-bottom:7px;}
+.c-bullets{gap:5px;}
+.c-bullet{font-size:14px;font-weight:500;line-height:1.6;color:var(--text2);}
+
+/* SETTINGS TAB */
+.settings-wrap{display:grid;grid-template-columns:200px 1fr;height:100%;overflow:hidden;}
+.settings-sidebar{
+  background:var(--sidebar);border-right:1px solid var(--border);
+  padding:16px 0;overflow-y:auto;
+}
+.settings-nav-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:0 16px 10px;}
+.settings-nav-item{
+  padding:10px 16px;cursor:pointer;font-size:13px;color:var(--muted);
+  transition:0.15s;border-left:2px solid transparent;
+}
+.settings-nav-item:hover{background:rgba(0,0,0,0.04);color:var(--text2);}
+.settings-nav-item.active{background:rgba(237,136,0,0.07);border-left-color:var(--gold2);color:var(--gold);font-weight:600;}
+
+.settings-main{overflow-y:auto;padding:32px 40px;background:var(--surface);}
+.settings-panel{display:none;}
+.settings-panel.active{display:block;}
+.settings-section-title{font-family:'Barlow',sans-serif;font-size:28px;font-weight:800;color:var(--navy);margin-bottom:6px;}
+.settings-section-sub{font-size:13px;color:var(--muted);margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+
+.settings-field-group{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:16px;}
+.settings-field-label{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.settings-field-sub{font-size:12px;color:var(--muted);margin-bottom:0;}
+.settings-input{
+  flex:1;background:#fff;border:1px solid var(--border);border-radius:7px;
+  padding:9px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;
+  transition:border-color 0.2s;
+}
+.settings-input:focus{outline:none;border-color:var(--navy4);}
+.settings-btn-test{
+  background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);
+  padding:8px 14px;border-radius:7px;font-size:12px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;white-space:nowrap;transition:0.2s;
+}
+.settings-btn-test:hover{background:rgba(0,127,163,0.15);}
+.settings-btn-save{
+  background:var(--gold2);color:#fff;border:none;
+  padding:8px 14px;border-radius:7px;font-size:12px;
+  font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;
+  white-space:nowrap;transition:0.2s;
+}
+.settings-btn-save:hover{background:var(--gold3);}
+
+/* SCRIPT EDITOR */
+.script-ed-section{background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;}
+.script-ed-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;cursor:pointer;background:var(--card2);
+  border-bottom:1px solid transparent;transition:0.15s;
+}
+.script-ed-hdr:hover{background:#eef0f4;}
+.script-ed-hdr.open{border-bottom-color:var(--border);}
+.script-ed-title{font-size:13px;font-weight:600;color:var(--text);}
+.script-ed-badge{font-size:10px;color:var(--muted);background:#eef0f4;padding:2px 8px;border-radius:99px;}
+.script-ed-body{padding:14px 16px;display:none;}
+.script-ed-body.open{display:block;}
+.script-line-ed{margin-bottom:10px;}
+.script-line-lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.script-line-ta{
+  width:100%;background:var(--bg);border:1px solid var(--border);
+  border-radius:6px;padding:8px 10px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:13px;
+  resize:vertical;min-height:52px;line-height:1.5;transition:border-color 0.2s;
+}
+.script-line-ta:focus{outline:none;border-color:var(--navy4);}
+.script-ed-actions{display:flex;gap:8px;margin-top:10px;}
+.script-ed-save{background:var(--gold2);color:#fff;border:none;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.script-ed-reset{background:transparent;color:var(--muted);border:1px solid var(--border);padding:7px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.script-ed-saved{font-size:11px;color:var(--green);display:none;margin-left:6px;align-self:center;}
+
+/* PERSONA EDITOR */
+.persona-ed{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:12px;}
+.persona-ed-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.persona-ed-sub{font-size:12px;color:var(--muted);margin-bottom:8px;}
+.persona-ed-ta{
+  width:100%;background:var(--bg);border:1px solid var(--border);
+  border-radius:6px;padding:10px 12px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:13px;
+  resize:vertical;min-height:90px;line-height:1.55;transition:border-color 0.2s;
+}
+.persona-ed-ta:focus{outline:none;border-color:var(--navy4);}
+
+/* SETTINGS MODAL OVERLAY (replaces tab) */
+.settings-overlay{
+  position:fixed;inset:0;background:rgba(0,30,60,0.55);
+  z-index:400;display:none;align-items:flex-start;justify-content:flex-end;
+  padding:68px 12px 0 0;
+}
+.settings-overlay.show{display:flex;}
+.settings-modal{
+  background:#fff;border:1px solid var(--border);border-radius:14px;
+  width:800px;max-width:96vw;max-height:85vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,30,60,0.18);
+  animation:fadeUp 0.25s ease;
+}
+.settings-modal-hdr{
+  background:var(--navy);padding:16px 20px;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.settings-modal-title{font-family:'Barlow',sans-serif;font-size:18px;font-weight:700;color:#fff;}
+.settings-modal-close{
+  background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
+  color:#fff;width:30px;height:30px;border-radius:6px;
+  cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
+}
+.settings-modal-body{display:grid;grid-template-columns:180px 1fr;flex:1;overflow:hidden;}
+.settings-modal-nav{background:var(--sidebar);border-right:1px solid var(--border);padding:12px 0;overflow-y:auto;}
+.settings-modal-main{overflow-y:auto;padding:24px 28px;background:var(--surface);}
+
+/* STAGE CURRENT LABEL */
+.stage-current-label{
+  font-size:12px;font-weight:600;color:var(--navy);
+  display:flex;align-items:center;gap:5px;margin-top:4px;
+}
+.stage-current-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--gold2);flex-shrink:0;
+  animation:pulse 1.2s ease-in-out infinite;
+}
+</style>
+
+</head>
+<body>
+
+<!-- API KEY MODAL -->
+<div class="apikey-overlay show" id="apikeyOverlay">
+  <div class="apikey-modal">
+    <div class="apikey-title" id="apikeyTitle">Welcome to RoofVantage Trainer</div>
+    <div class="apikey-sub" id="apikeySubtitle">This app uses the Anthropic Claude API to power the AI customer. Each person needs their own free API key — takes 2 minutes to get.</div>
+    <div class="apikey-label">Your Anthropic API Key</div>
+    <input class="apikey-input" type="password" id="apikeyInput" placeholder="sk-ant-api03-..." autocomplete="off" />
+    <div class="apikey-help">Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys → Create Key.</div>
+    <div id="apikeyStatus" style="margin-bottom:12px;font-size:13px;min-height:20px;"></div>
+    <label class="apikey-remember">
+      <input type="checkbox" id="apikeyRemember" checked> Remember this key on this device
+    </label>
+    <div class="apikey-actions">
+      <button class="btn-ghost" onclick="testApiKey()" id="apikeyTestBtn" style="flex:0 0 auto;">Test Key</button>
+      <button class="btn-gold" onclick="saveApiKey()" id="apikeySaveBtn" style="flex:1;padding:12px;">Save & Start →</button>
+    </div>
+  </div>
+</div>
+<div class="hdr">
+  <div class="logo">
+    <img src="https://callroofvantage.com/wp-content/uploads/2025/12/logo-1.png"
+         alt="RoofVantage"
+         id="siteLogoImg"
+         style="height:38px;max-width:180px;object-fit:contain;display:block;"
+         onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex';">
+    <div id="logoFallback" style="display:none;align-items:center;gap:10px;">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="36" height="36" rx="7" fill="#003865"/>
+        <polygon points="18,6 32,18 4,18" fill="#ED8800"/>
+        <rect x="10" y="18" width="16" height="12" rx="1" fill="#D38328"/>
+        <rect x="15" y="22" width="6" height="8" rx="1" fill="#003865"/>
+      </svg>
+      <div>
+        <div class="logo-name">RoofVantage</div>
+        <div class="logo-sub">Raleigh &amp; Wilmington, NC</div>
+      </div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('learn',this)">📚 Learn</button>
+    <button class="tab-btn" onclick="switchTab('simulate',this)">🎯 Practice</button>
+  </div>
+  <div class="hdr-right">
+    <div class="progress-pill" id="gProgress">0 / 19 complete</div>
+    <button onclick="openSettings()" title="Settings" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);width:34px;height:34px;border-radius:7px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">⚙️</button>
+  </div>
+</div>
+<div class="prog-line"><div class="prog-line-inner" id="progInner" style="width:0%"></div></div>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- ══ LEARN ══ -->
+  <div class="tab-panel active" id="p-learn">
+    <div class="learn-wrap">
+      <div class="learn-nav" id="learnNav"></div>
+      <div class="learn-main" id="learnMain"></div>
+    </div>
+  </div>
+
+  <!-- ══ SIMULATE ══ -->
+  <div class="tab-panel" id="p-simulate">
+    <div class="sim-setup" id="simSetup">
+      <div class="sim-hero">
+        <h2>Live Simulation</h2>
+        <p>No script. Real objections. Close the deal or go home.</p>
+      </div>
+      <div class="sim-grid">
+        <div class="sim-card">
+          <div class="sim-card-lbl">Scenario</div>
+          <div class="sim-opt sel" data-g="scenario" data-v="single" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">🏠</span><span>Single homeowner</span></div>
+          <div class="sim-opt" data-g="scenario" data-v="couple" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">👫</span><span>Couple — one skeptic</span></div>
+          <div class="sim-opt" data-g="scenario" data-v="bids" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">📋</span><span>Already has 2 bids</span></div>
+          <div class="sim-opt" data-g="scenario" data-v="insurance" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">⏰</span><span>Insurance deadline</span></div>
+        </div>
+        <div class="sim-card">
+          <div class="sim-card-lbl">Difficulty</div>
+          <div class="sim-opt" data-g="diff" data-v="easy" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">😊</span><span>Easy — Friendly</span></div>
+          <div class="sim-opt sel" data-g="diff" data-v="realistic" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">🤔</span><span>Realistic — Typical</span></div>
+          <div class="sim-opt" data-g="diff" data-v="hard" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">😤</span><span>Hard — Skeptical</span></div>
+        </div>
+        <div class="sim-card">
+          <div class="sim-card-lbl">Voice Mode</div>
+          <div class="sim-opt sel" data-g="voice" data-v="text" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">⌨️</span><span>Text only</span></div>
+          <div class="sim-opt" data-g="voice" data-v="mic" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">🎤</span><span>Text + Mic</span></div>
+          <div class="sim-opt" data-g="voice" data-v="full" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">🔊</span><span>Full voice (TTS + Mic)</span></div>
+        </div>
+        <div class="sim-card">
+          <div class="sim-card-lbl">Objection Focus</div>
+          <div class="sim-opt sel" data-g="obj" data-v="all" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">🎲</span><span>Mix by difficulty</span></div>
+          <div class="sim-opt" data-g="obj" data-v="price" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">💰</span><span>Price focused</span></div>
+          <div class="sim-opt" data-g="obj" data-v="bids" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">📊</span><span>Getting other bids</span></div>
+          <div class="sim-opt" data-g="obj" data-v="spouse" onclick="selOpt(this)"><div class="sim-radio"></div><span class="sim-icon">👥</span><span>Spouse / timing</span></div>
+        </div>
+      </div>
+      <button class="btn-start" id="startBtn" onclick="startSim()">Start Simulation →</button>
+      <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 16px;max-width:460px;width:100%;">
+        <span style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">🔊 Voice</span>
+        <button onclick="testVoice()" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">▶ Test</button>
+        <span id="voiceStatusLabel" style="font-size:11px;color:var(--muted);">Browser TTS • Add OpenAI key in Settings for natural voice</span>
+      </div>
+    </div>
+
+    <!-- ACTIVE SIM -->
+    <div class="sim-active" id="simActive">
+      <div class="sim-topbar">
+        <div class="sim-badges">
+          <div class="sbadge sb-scenario" id="sb-scenario">—</div>
+          <div class="sbadge" id="sb-diff">—</div>
+        </div>
+        <div class="sim-stats">
+          <div><div class="sstat-val" id="simClock">0:00</div><div class="sstat-lbl">Time</div></div>
+          <div><div class="sstat-val" id="simExch">0</div><div class="sstat-lbl">Exchanges</div></div>
+          <div><div class="sstat-val" id="simAvgGrade">—</div><div class="sstat-lbl">Avg Grade</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button id="simCustTtsBtn" onclick="toggleTTS('cust')" title="Read customer responses aloud" class="tts-toggle-btn">🔇 Customer</button>
+          <button id="simRepTtsBtn"  onclick="toggleTTS('rep')"  title="Read your responses aloud"    class="tts-toggle-btn">🔇 You</button>
+          <button class="btn-end" onclick="endSim()">End & Score</button>
+        </div>
+      </div>
+      <div class="sim-body">
+        <div class="sim-chat">
+          <div class="sim-msgs" id="simMsgs"></div>
+          <div class="sim-input">
+            <div class="sim-row">
+              <textarea class="chat-ta" id="simInput" placeholder="Respond to the customer…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendSim();}"></textarea>
+              <button class="btn-mic" id="simMic" onclick="toggleMic('sim')" title="Voice input">🎤</button>
+              <button class="btn-send" id="simSend" onclick="sendSim()">➤</button>
+            </div>
+          </div>
+        </div>
+        <div class="coaching-col">
+          <div class="coaching-hdr">🧠 Live Coaching</div>
+          <div class="coaching-feed" id="coachFeed">
+            <div class="c-item tip">
+              <div class="c-lbl tip">Tip</div>
+              <ul class="c-bullets"><li class="c-bullet"><span>Start with your greeting — frame this as a team walkthrough, not a sales pitch.</span></li></ul>
+            </div>
+          </div>
+          <div class="stage-panel">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <div class="stage-ttl" style="margin-bottom:0;">Script Coverage</div>
+              <button onclick="toggleStages()" id="stageToggleBtn" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 4px;">▸ Show</button>
+            </div>
+            <div style="height:6px;background:#eef0f4;border-radius:99px;overflow:hidden;margin-bottom:5px;">
+              <div id="stagePctBar" style="height:100%;background:var(--gold2);border-radius:99px;width:0%;transition:width 0.4s;"></div>
+            </div>
+            <div class="stage-current-label" id="stageCurrentLabel">
+              <div class="stage-current-dot"></div>
+              <span id="stageCurrentName">Not started</span>
+              <span style="color:var(--muted);font-weight:400;margin-left:auto;" id="stagePctLabel">0 / 19</span>
+            </div>
+            <div id="stageList" style="display:none;margin-top:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SETTINGS MODAL ══ -->
+  <div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
+    <div class="settings-modal">
+      <div class="settings-modal-hdr">
+        <div class="settings-modal-title">⚙️ Settings</div>
+        <button class="settings-modal-close" onclick="closeSettings()">✕</button>
+      </div>
+      <div class="settings-modal-body">
+        <div class="settings-modal-nav">
+          <div class="settings-nav-item active" onclick="showSettingsPanel('keys',this)">🔑 API Keys</div>
+          <div class="settings-nav-item" onclick="showSettingsPanel('script',this)">📝 Script Editor</div>
+          <div class="settings-nav-item" onclick="showSettingsPanel('customer',this)">🏠 Customer Personas</div>
+        </div>
+        <div class="settings-modal-main">
+          <!-- API KEYS -->
+          <div class="settings-panel active" id="sp-keys">
+            <div class="settings-section-title">API Keys</div>
+            <div class="settings-section-sub">Keys are stored only in your browser. Share the file freely — each person enters their own keys.</div>
+            <div class="settings-field-group">
+              <div class="settings-field-label">Anthropic API Key <span style="color:var(--red)">*required</span></div>
+              <div class="settings-field-sub">Powers the AI customer. Get yours free at <a href="https://console.anthropic.com" target="_blank" style="color:var(--blue);">console.anthropic.com</a></div>
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <input type="password" id="settingsAnthropicKey" class="settings-input" placeholder="sk-ant-api03-..." />
+                <button class="settings-btn-test" onclick="testSettingsKey('anthropic')">Test</button>
+                <button class="settings-btn-save" onclick="saveSettingsKey('anthropic')">Save</button>
+              </div>
+              <div id="anthropicKeyStatus" style="margin-top:6px;font-size:12px;min-height:16px;"></div>
+            </div>
+            <div class="settings-field-group">
+              <div class="settings-field-label">OpenAI API Key <span style="color:var(--muted);font-weight:400;">optional — natural voice TTS</span></div>
+              <div class="settings-field-sub">Unlocks OpenAI "onyx" voice (deep, natural male). ~$0.02/session. Get a key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--blue);">platform.openai.com</a></div>
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <input type="password" id="settingsOpenAIKey" class="settings-input" placeholder="sk-..." />
+                <button class="settings-btn-test" onclick="testSettingsKey('openai')">Test</button>
+                <button class="settings-btn-save" onclick="saveSettingsKey('openai')">Save</button>
+              </div>
+              <div id="openaiKeyStatus" style="margin-top:6px;font-size:12px;min-height:16px;"></div>
+              <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
+                <button onclick="testVoice()" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);padding:6px 16px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">▶ Test Voice</button>
+                <span id="activeVoiceLabel" style="font-size:12px;color:var(--muted);"></span>
+              </div>
+            </div>
+          </div>
+          <!-- SCRIPT EDITOR -->
+          <div class="settings-panel" id="sp-script">
+            <div class="settings-section-title">Script Editor</div>
+            <div class="settings-section-sub">Edit the rep's lines. Changes save to your browser and are used in Practice sessions.</div>
+            <div id="scriptEditorList"></div>
+          </div>
+          <!-- CUSTOMER PERSONAS -->
+          <div class="settings-panel" id="sp-customer">
+            <div class="settings-section-title">Customer Personas</div>
+            <div class="settings-section-sub">Customize each customer scenario's personality. Sent directly to the AI.</div>
+            <div id="personaEditorList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app-body -->
+
+<!-- SCORECARD -->
+<div class="sc-overlay" id="scOverlay">
+  <div class="sc-modal">
+    <div class="sc-title">Session Scorecard</div>
+    <div class="sc-sub" id="scSub"></div>
+    <div class="sc-score" id="scScore"></div>
+    <div class="sc-grade-lbl" id="scGradeLbl"></div>
+    <div class="sc-grid" id="scGrid"></div>
+    <div id="scFb"></div>
+    <div class="sc-actions">
+      <button class="btn-ghost" onclick="closeScorecard()">Close</button>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-ghost" onclick="downloadSession('txt')" title="Download as text file" style="padding:10px 12px;font-size:12px;">📄 TXT</button>
+        <button class="btn-ghost" onclick="downloadSession('html')" title="Download as HTML" style="padding:10px 12px;font-size:12px;">🌐 HTML</button>
+      </div>
+      <button class="btn-gold" onclick="resetSim()">New Session</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+const SECS = [
+  {id:1,title:"Introduction & Framing",badge:"Opening",sub:"Set the tone. Make them feel like a partner, not a prospect.",
+   obj:{icon:"🤝",txt:"Build instant trust and frame the visit as collaborative, not a sales pitch."},
+   lines:[{t:"say",txt:"Thanks again for having me out today."},{t:"say",txt:"What I'm going to do is walk you through exactly how we do things, start to finish."},{t:"say",txt:"By the time we're done, there won't be a single thing happening on your roof that you don't already know about."},{t:"say",txt:"This is a team thing — me and you are going to go through this together so there are no surprises."}],
+   keys:["Use 'team' language — 'me and you,' 'together,' 'no surprises'","You're a guide, not a salesperson at this stage","Sets expectation of full transparency before price comes up"],
+   quiz:[{q:"What's the main goal of your opening?",opts:["Get to price quickly","Build trust and frame it as a team effort","Talk about competitors","Ask about budget"],ans:1,fb:"Correct! Opening is about rapport and framing — not selling yet."}]},
+  {id:2,title:"Industry Failure Rates",badge:"Credibility",sub:"Plant the seed of risk. Who they hire matters as much as price.",
+   obj:{icon:"📊",txt:"Establish urgency around contractor selection. Make them think beyond price."},
+   lines:[{t:"say",txt:"Let me start with the industry, because who you hire matters as much as the price."},{t:"say",txt:"In the home improvement world, if 100 contractors start today, within one year about 50 of them will be out of business."},{t:"say",txt:"Within five years, around 96% of them are gone."},{t:"say",txt:"Roofing is usually even worse than that."},{t:"say",txt:"So when you're choosing a contractor, you're not just buying today's price — you're buying who's still going to be around if there's an issue later."}],
+   keys:["50% gone in 1 year, 96% gone in 5 years — memorize these stats","Roofing failure rates are even higher","Reframe: it's not just price, it's who's still around later"],
+   quiz:[{q:"What % of contractors are gone within 5 years?",opts:["50%","75%","96%","80%"],ans:2,fb:"96%! And roofing is even worse. This makes longevity feel more important than price."}]},
+  {id:3,title:"Types of Companies",badge:"Positioning",sub:"Define the landscape before you introduce yourself.",
+   obj:{icon:"🎯",txt:"Position favorably against 3 archetypes without directly bashing anyone."},
+   lines:[{t:"say",txt:"Now let me show you the kinds of companies you could be working with."},{t:"say",txt:"First, the big investor-owned companies — CEO, CFO, layers of management. They keep prices high to cover margins. On a roof like yours, $20–30K, sometimes $50K.",tag2:"Investor-Owned"},{t:"say",txt:"Next, the family-owned companies. Good people, but they stretch thin on resources and schedule. Insurance deadlines? They struggle to fit you in. We keep specific slots open for exactly that.",tag2:"Family-Owned"},{t:"say",txt:"And then you've got the 'Chuck in a Truck' guys. Cheapest materials, cheapest price — but that's where corners get cut. That's when people call us back to fix leaks.",tag2:"Chuck in a Truck"},{t:"say",txt:"My job today is to show you how we're different from all of that, and then let you decide what makes the most sense for your home."}],
+   keys:["3 buckets: Investor-owned (expensive), Family (unreliable), Chuck in a Truck (cut corners)","Don't bash — describe weaknesses factually","Always end with 'let YOU decide' — removes pressure"]},
+  {id:4,title:"Who We Are",badge:"Credentials",sub:"Licensed, insured, documented. Say it simply and offer the paperwork.",
+   obj:{icon:"🏆",txt:"Build credibility quickly. Offer paperwork proactively."},
+   lines:[{t:"say",txt:"We're a licensed general contractor."},{t:"say",txt:"We're actually a little overqualified for the roofing world — we could build a skyscraper in your backyard if we wanted to."},{t:"say",txt:"We're also fully insured. If you'd like to see our license or insurance paperwork, I can send that right over — a lot of people like to have it for their records."},{t:"say",txt:"We run a very professional, documented process. We want you to feel like you know exactly what's happening the whole time."}],
+   keys:["Licensed GC = overqualified for roofing (use the skyscraper line — it's memorable)","Always offer the paperwork proactively","'Documented process' sets up the project manager story"]},
+  {id:5,title:"Project Manager & Docs",badge:"Process",sub:"Dedicated PM on site is a major differentiator.",
+   obj:{icon:"📸",txt:"Paint a picture of photo-documented professionalism that protects the homeowner."},
+   lines:[{t:"say",txt:"One big difference with us is that you get a dedicated project manager on site."},{t:"say",txt:"He's there before the crew shows up. Makes sure all the materials are correct."},{t:"say",txt:"He takes pictures before, during, and after the job. Everything we go over today is exactly what gets put on your roof."},{t:"say",txt:"When we're done, you get a written report with all those images."},{t:"say",txt:"That way, if insurance ever comes out years from now and says 'I don't think this was installed properly,' you can say 'Actually yes it was — here are the pictures to prove it.'"}],
+   keys:["PM arrives BEFORE crew — checks materials first","Before, during, and after photos — the proof layer","The insurance scenario is powerful — documentation feels protective"]},
+  {id:6,title:"Mission & Relationship",badge:"Connection",sub:"Humanize the transaction. You'll be accessible after the sale.",
+   obj:{icon:"🤙",txt:"Build personal connection. Make them feel you'll be reachable."},
+   lines:[{t:"say",txt:"Our mission is to make this a smooth, professional process for you."},{t:"say",txt:"We keep a good streamline of communication the whole way."},{t:"say",txt:"This is teamwork — we're working towards the same goal: getting this roof done right, one time, so you don't have to worry about it."},{t:"say",txt:"I'll give you my direct number — me and you are basically friends after this."}],
+   keys:["'Done right, one time' — this phrase sticks","Give your direct number — shows accountability","'Basically friends' — lowers their guard without being cheesy"]},
+  {id:7,title:"Shingle Manufacturers",badge:"Products",sub:"Don't bash competitors. Show why CertainTeed wins on weight.",
+   obj:{icon:"🏠",txt:"Get a yes on weight = durability logic. This yes carries to the close."},
+   lines:[{t:"say",txt:"The top shingle manufacturers are GAF and CertainTeed. They all make good shingles — warranties are very similar. I don't bash any of them."},{t:"say",txt:"Where we're different: we use CertainTeed Landmark shingles. They're a little bit heavier than others — you can even see it when you compare them side by side."},{t:"ask",txt:"Would you agree that having that extra weight usually means a little more durability on your roof?"},{t:"think",txt:"Wait for the 'Yes.' This micro-commitment builds toward the close."},{t:"say",txt:"Most people do. So there's no downside on warranty or quality — we just give you that extra durability from the added weight."}],
+   keys:["Don't bash GAF — say they're all good, then differentiate","The weight = durability question is a YES close — get the nod","CertainTeed Landmark: heavier, visible difference side by side"],
+   quiz:[{q:"Why ask 'Would you agree extra weight means more durability?'",opts:["To fill silence","It's a micro-commitment — builds agreement momentum","To show product knowledge","To test attention"],ans:1,fb:"Every small 'yes' builds momentum. By price time, they've agreed many times."}]},
+  {id:8,title:"Warranty Explanation",badge:"Value",sub:"The transferable warranty is something most homeowners haven't considered.",
+   obj:{icon:"📋",txt:"Close on the warranty. Get another yes. Plant the resale value idea."},
+   lines:[{t:"say",txt:"As a company, we back our work with a workmanship warranty."},{t:"say",txt:"Then on top of that, you get a 50-year warranty from CertainTeed on the roofing system."},{t:"say",txt:"Another important piece: that warranty is one-time transferable. If you sell in 20–25 years, you can pass that warranty to the next owner for the rest of the term."},{t:"say",txt:"For people who might sell at some point, that's a big selling point that can help your home stand out."},{t:"ask",txt:"Do you like how that warranty works — especially that it can transfer if you sell?"}],
+   keys:["Two layers: workmanship (us) + 50-year CertainTeed product warranty","Transferable = resale value — most homeowners never think about this","Get the yes on the warranty before moving to installation"]},
+  {id:9,title:"Installation Day",badge:"Installation",sub:"Walk them through the morning. Show professionalism before the first nail.",
+   obj:{icon:"🔨",txt:"Show that protecting their property is the first priority."},
+   lines:[{t:"say",txt:"Our crew shows up around 6:45–7:00 in the morning."},{t:"say",txt:"First thing we do is protect your property — tarp around the house, cover your flower beds, put plywood over your HVAC unit."},{t:"say",txt:"That makes the cleanup process much easier and keeps your property safe."},{t:"say",txt:"Once everything is protected, we tear off the old roof down to the decking. That lets us see what's really going on under there."}],
+   keys:["Specific arrival time (6:45–7am) shows professionalism","HVAC plywood cover — specific detail that impresses homeowners","Tear-off down to decking — shows thoroughness"]},
+  {id:10,title:"Decking & Rot",badge:"Installation",sub:"Handle the hidden cost fear before it happens.",
+   obj:{icon:"🪵",txt:"Preemptively eliminate fear of surprise costs. Show you ask permission first."},
+   lines:[{t:"say",txt:"If we see any rotted decking, we take care of it the right way. In our pricing, we include up to two sheets of decking."},{t:"say",txt:"If we find more: we take pictures, knock on your door, show you what we're seeing — and only move forward with your approval."},{t:"say",txt:"Additional decking is $100 per sheet. That covers material, labor to remove and replace, and haul-away."},{t:"say",txt:"'I can buy plywood cheaper at the store.' True — but factor in tearing it out, cutting it, putting it back, and hauling away the waste. That's where $100 comes from."},{t:"ask",txt:"Does that make sense so far?"}],
+   keys:["2 sheets included in pricing — this is a value statement","Pictures → knock on door → approval → proceed. Say this sequence.","$100/sheet — justify it proactively before they object"]},
+  {id:11,title:"Flashing Inspection",badge:"Installation",sub:"Show attention to detail. Justify the cost before they ask.",
+   obj:{icon:"🔩",txt:"Show that flashing is reviewed, not assumed — same photo-approval process."},
+   lines:[{t:"say",txt:"After the decking, we inspect all of your flashing. If it's in good shape and we can reuse it, we will."},{t:"say",txt:"Most of the time when you're investing in a new roof, it makes sense to update the flashing too."},{t:"say",txt:"If we need to replace it: pictures, show you why, talk through it before we move forward."},{t:"say",txt:"That extra cost is usually around $4 per linear foot — nothing crazy, but it makes sure the system is tight."}],
+   keys:["$4/linear foot — mention it casually, 'nothing crazy'","Same photo-and-approval process as decking — consistency","Reuse if possible — shows you're not upselling everything"]},
+  {id:12,title:"Waterproofing Underlayment",badge:"Materials",sub:"Have a sample. Let them feel it. Tactile = memorable.",
+   obj:{icon:"💧",txt:"Use the physical sample to create a sensory moment that sticks."},
+   lines:[{t:"say",txt:"Once deck and flashing are good, we put down waterproofing underlayment in your most leak-prone areas: valleys, roof-to-wall connections, pipe boots and vent stacks."},{t:"say",txt:"Go ahead and feel this product — you can see how sticky it is. Gets installed directly on the wood deck."},{t:"say",txt:"When it heats up, it adheres to the deck. If a nail goes through it later, it actually self-seals around that nail."},{t:"say",txt:"That's why we say there is basically no way for water to get through in those spots when installed correctly."}],
+   keys:["Let them feel the sample — tactile = memorable","Self-sealing around nails is a wow moment","3 vulnerable areas: valleys, pipe boots, roof-to-wall. Memorize these."]},
+  {id:13,title:"Synthetic Underlayment",badge:"Materials",sub:"Quick. It's the second moisture barrier. Cover it and move on.",
+   obj:{icon:"🛡️",txt:"Show full deck coverage. This ties the waterproofing story together."},
+   lines:[{t:"say",txt:"Then we cover the rest of the roof with a synthetic underlayment."},{t:"say",txt:"This acts as your second moisture barrier under the shingles."},{t:"say",txt:"It's tear-resistant, lays nicely, and covers everything from edge to edge."}],
+   keys:["Second layer = second line of defense","Covers everything the ice & water shield doesn't","Keep this brief — ice & water section is the star"]},
+  {id:14,title:"Drip Edge",badge:"Materials",sub:"Not required by NC code everywhere — doing it anyway is a differentiator.",
+   obj:{icon:"🌧️",txt:"Position drip edge as going beyond the minimum. Protects fascia and gutters."},
+   lines:[{t:"say",txt:"Next, we install aluminum drip edge on all your eaves and rakes — the bottom and sloped sides of your roof."},{t:"say",txt:"It kicks water away from your fascia so it doesn't rot, and helps direct water cleanly into your gutters."},{t:"say",txt:"It also prevents water from seeping back up under the shingles."},{t:"say",txt:"This isn't required by North Carolina code everywhere, but we do it on every single job. That's how we differentiate from companies that just do the minimum."}],
+   keys:["Not required by NC code in all areas — we do it anyway","3 functions: protects fascia, directs to gutters, prevents back-seep","Use this to contrast against 'Chuck in a Truck' guys"]},
+  {id:15,title:"Starter Shingles & Wind",badge:"Materials",sub:"130 mph = Category 3–4 hurricane. That matters in NC.",
+   obj:{icon:"💨",txt:"Make wind protection tangible. 130 mph means something in Raleigh and Wilmington."},
+   lines:[{t:"say",txt:"Then we put on a starter shingle around the edges. This is part of what allows us to offer up to 130 mph wind protection."},{t:"say",txt:"That's around a Category 3 to 4 hurricane level."},{t:"say",txt:"When it heats up, it bonds to the first course of shingles — keeps wind from getting under the edge and peeling shingles up."}],
+   keys:["130 mph = Category 3–4 hurricane — always say this in NC","Starter bonds to first shingle course = wind can't get under edge","Connects back to the underlayment story"]},
+  {id:16,title:"Shingle Technology",badge:"Materials",sub:"Algae resistance and the 6-nail standard.",
+   obj:{icon:"🔬",txt:"Show the shingle is engineered and your installation exceeds code."},
+   lines:[{t:"say",txt:"On the shingle itself, two big things."},{t:"say",txt:"First, streak and algae resistance. You've probably seen roofs with black streaks at 10–15 years old. CertainTeed uses copper-infused granules to fight that. That's why they back it with a 15-year streak warranty."},{t:"say",txt:"Second, the nailing strip. I call it the nailing strip for dummies — you'd have to try to miss it. By code, 4 nails gets 115 mph. We always put 6 nails per shingle."},{t:"say",txt:"That's what gets you to the 130 mph wind rating."},{t:"ask",txt:"Do you have any questions about the products or how we install them?"}],
+   keys:["Copper-infused granules = 15-year streak warranty","4 nails = code (115 mph). 6 nails = 130 mph. We always exceed code.","'Nailing strip for dummies' — gets laughs and sticks in memory"]},
+  {id:17,title:"People, Process & Cleanup",badge:"Wrap-Up",sub:"Tie it all together. Remind them who's involved and how it ends.",
+   obj:{icon:"✅",txt:"Paint the finish line clearly. Final walkthrough = their sign-off."},
+   lines:[{t:"say",txt:"I'm your design consultant — my job is to make sure we cover every box."},{t:"say",txt:"You'll have that dedicated project manager on site from start to finish — making sure everything matches what we promised."},{t:"say",txt:"At the end of the job, we focus heavily on cleanup. We run magnetic rollers through the entire yard. Handheld magnets in the tighter areas."},{t:"say",txt:"The goal is to leave your property better than we found it — no nails, no trash left behind."},{t:"say",txt:"Then the project manager does a final walk-through with you. Once you're happy, we finalize everything and you enjoy your new roof."}],
+   keys:["Magnetic rollers + handheld magnets = thorough, specific cleanup","'Leave it better than we found it' — memorable close-out line","Final walkthrough with PM = accountability, your sign-off matters"]},
+  {id:18,title:"Check for Yeses",badge:"Pre-Close",sub:"Do NOT go to price until you have three yeses.",
+   obj:{icon:"☑️",txt:"Lock in agreement on company, product, and warranty before price appears."},
+   lines:[{t:"ask",txt:"Do you like our company and the way we do business?"},{t:"think",txt:"Wait for yes."},{t:"ask",txt:"Do you feel good about the products we're using and how we install them?"},{t:"think",txt:"Wait for yes."},{t:"ask",txt:"Are you comfortable with the warranty and the way we stand behind our work?"},{t:"think",txt:"Wait for yes. Then say:"},{t:"say",txt:"Okay, great. So the only thing left is to see if we can make the numbers work for you."}],
+   keys:["3 questions, 3 yeses. Don't skip any.","If you get a 'not really,' address it before going to price","'Only thing left' reframes price as the one remaining obstacle"],
+   quiz:[{q:"What do the 3 pre-close questions lock in?",opts:["Budget","Agreement on company, product, and warranty","Timeline","Referrals"],ans:1,fb:"You need yes on all three before price. If they don't like the product, price won't fix it."}]},
+  {id:19,title:"Pricing & Closing",badge:"Close",sub:"Four structured price drops, each with a justified reason.",
+   obj:{icon:"💰",txt:"Present price in structured drops. Every drop has a story. Never cut without explaining why."},
+   lines:[{t:"say",txt:"So you're probably wondering — after all this, what's the price?",tag2:"Setup"},{t:"say",txt:"We give you a one-year price on the roof. But you're looking to move forward a lot sooner than one year, right?",tag2:"1-Year"},{t:"say",txt:"So we give a 30-day price as well. [Show price. Shut up. Let them talk first.]",tag2:"30-Day"},{t:"objection",txt:"Homeowner: 'This is just not something we can do right now...'"},{t:"think",txt:"Don't jump in. Let them finish. Uncover the real objection."},{t:"say",txt:"If there was a way I could save you some money, wouldn't you at least want to hear about it?",tag2:"Same-Day Setup"},{t:"say",txt:"We run a same-day promotional — it saves me time and money on a return trip, so we pass that savings to you.",tag2:"Same-Day"},{t:"objection",txt:"Homeowner: 'That's still too high.'"},{t:"say",txt:"If it were free today, would you move forward?",tag2:"Price Test"},{t:"say",txt:"So you like the company, the product, the warranty — it all just comes down to price. What's the holdup?"},{t:"say",txt:"You buy on value. Why didn't you get the cheapest shoes or the cheapest truck? A roof is the same thing.",tag2:"Value Talk"},{t:"say",txt:"We work with CertainTeed and sometimes they have rebates. Let me call my manager to see if there are any CertainTeed bucks available.",tag2:"CertainTeed Bucks"},{t:"say",txt:"[After callback] CertainTeed has $2,000 they can throw at this job. First-come, first-serve. That brings your price to 8-seven. We've saved you $4,300 total.",tag2:"True Bottom"},{t:"close",txt:"So — do you want to do cash or check for the deposit? We do half down, half on completion.",tag2:"Assumption Close"}],
+   keys:["1-Year → 30-Day → Same-Day → CertainTeed Bucks. Every drop has a reason.","Never cut price without a story — unjustified drops look sketchy","Same-day saves you time on return trips — customer earns the discount","Assumption close: 'Cash or check?' not 'Do you want to move forward?'"],
+   quiz:[{q:"What's wrong with dropping price $2K with no explanation?",opts:["Nothing — customers love discounts","It looks like the original price was made up — erodes trust","You should drop even more","The manager won't allow it"],ans:1,fb:"Every drop needs a story. Unjustified drops make the whole pricing feel fake."}]}
+];
+
+const STAGES = ["Introduction","Industry Stats","Company Types","Credentials","Project Manager","Mission","Shingles","Warranty","Installation","Decking","Flashing","Underlayment","Synthetic","Drip Edge","Starter/Wind","Shingle Tech","Cleanup","Pre-Close","Price & Close"];
+
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let learnIdx=0, learnDone=new Set();
+let cfg={scenario:'single',diff:'realistic',voice:'text',obj:'all'};
+let sim={running:false,msgs:[],exch:0,t0:null,timer:null,stages:new Set(),grades:[],won:false};
+let ttsEnabled={cust:false,rep:false};
+let isSpeaking=false;
+let OPENAI_KEY='';
+// Custom script overrides (from settings editor)
+let customLines={};  // {sectionIdx_lineIdx: 'custom text'}
+// Custom persona overrides
+const DEFAULT_PERSONAS={
+  single:"You are a homeowner named Mike, mid-50s, pragmatic, in Raleigh NC. Your roof is 15 years old with some minor issues.",
+  couple:"You play TWO characters — homeowner Dave who is interested, and his wife Linda who is skeptical about price. Alternate voices, marking each with their name.",
+  bids:"You are homeowner Sarah. You already have two bids: $14,000 and $11,500. You mention these early and use them as leverage throughout.",
+  insurance:"You are homeowner Robert. Your insurance company gave you a 3-week deadline for roof replacement or your claim gets denied. You are stressed about the timeline."
+};
+let customPersonas={...DEFAULT_PERSONAS};
+
+// ══════════════════════════════════════
+// TABS
+// ══════════════════════════════════════
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════
+// LEARN TAB
+// ══════════════════════════════════════
+function buildLearn(){
+  const nav=document.getElementById('learnNav');
+  const main=document.getElementById('learnMain');
+  nav.innerHTML='<div class="nav-group-lbl">All Sections</div>';
+  main.innerHTML='';
+  SECS.forEach((s,i)=>{
+    const n=document.createElement('div');
+    n.className='lnav'+(i===0?' active':'');
+    n.id='ln-'+i;
+    n.innerHTML=`<span class="lnav-num">${String(s.id).padStart(2,'0')}</span><span class="lnav-dot"></span><span>${s.title}</span>`;
+    n.onclick=()=>goLearn(i);
+    nav.appendChild(n);
+    const sec=document.createElement('div');
+    sec.className='l-sec'+(i===0?' active':'');
+    sec.id='ls-'+i;
+    let h=`<div class="sec-badge">${s.badge}</div>
+      <div class="sec-title">${s.title}</div>
+      <div class="sec-sub">${s.sub}</div>`;
+    if(s.obj) h+=`<div class="obj-box"><div class="obj-icon">${s.obj.icon}</div><div><div class="obj-lbl">Objective</div><div class="obj-txt">${s.obj.txt}</div></div></div>`;
+    h+=`<button class="reveal-btn" onclick="revealAll(${i})">👁 Reveal All Lines</button><div class="lines">`;
+    s.lines.forEach((l,li)=>{
+      const tc='t-'+(l.t||'say');
+      const tl={say:'SAY',think:'INTERNAL',ask:'ASK',close:'CLOSE',objection:'OBJECTION'}[l.t]||'SAY';
+      const txt = customLines[i+'_'+li] || l.txt;
+      h+=`<div class="lcard" id="lc-${i}-${li}" onclick="revealLine(${i},${li})">
+        <div class="ltag ${tc}">${tl}${l.tag2?' — '+l.tag2:''}</div>
+        <div class="ltext blur" id="lt-${i}-${li}">${txt}</div>
+        <div class="lhint" id="lh-${i}-${li}">Tap to reveal</div></div>`;
+    });
+    h+='</div>';
+    if(s.keys){h+=`<div class="kp-box"><div class="kp-lbl">Key Points</div>`;s.keys.forEach(k=>{h+=`<div class="kp"><span class="kp-dot">→</span><span>${k}</span></div>`;});h+='</div>';}
+    if(s.quiz){h+='<hr class="div">';s.quiz.forEach((q,qi)=>{h+=`<div class="quiz-block"><div class="quiz-q">🧠 ${q.q}</div><div class="quiz-opts">`;q.opts.forEach((o,oi)=>{h+=`<button class="quiz-opt" id="qo-${i}-${qi}-${oi}" onclick="ansQ(${i},${qi},${oi},${q.ans},'${q.fb.replace(/'/g,"\\'")}')">${String.fromCharCode(65+oi)}. ${o}</button>`;});h+=`</div><div class="quiz-fb" id="qf-${i}-${qi}"></div></div>`;});}
+    h+=`<div class="sec-nav">${i>0?`<button class="btn-ghost" onclick="goLearn(${i-1})">← Previous</button>`:''}<button class="btn-gold" onclick="doneLearn(${i})">${i<SECS.length-1?'Mark Done & Continue →':'🎉 Complete Training'}</button></div>`;
+    sec.innerHTML=h;
+    main.appendChild(sec);
+  });
+}
+function goLearn(i){
+  document.querySelectorAll('.l-sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.lnav').forEach(n=>n.classList.remove('active'));
+  document.getElementById('ls-'+i).classList.add('active');
+  document.getElementById('ln-'+i).classList.add('active');
+  learnIdx=i;
+  document.getElementById('learnMain').scrollTop=0;
+}
+function revealLine(si,li){
+  const lt=document.getElementById(`lt-${si}-${li}`);
+  const lh=document.getElementById(`lh-${si}-${li}`);
+  const lc=document.getElementById(`lc-${si}-${li}`);
+  if(lt){lt.classList.remove('blur');lc.classList.add('revealed');}
+  if(lh)lh.style.display='none';
+}
+function revealAll(si){SECS[si].lines.forEach((_,li)=>revealLine(si,li));}
+function ansQ(si,qi,sel,ans,fb){
+  document.querySelectorAll(`[id^="qo-${si}-${qi}-"]`).forEach((o,i)=>{
+    o.style.pointerEvents='none';
+    if(i===ans)o.classList.add('correct');
+    else if(i===sel&&i!==ans)o.classList.add('wrong');
+  });
+  const el=document.getElementById(`qf-${si}-${qi}`);
+  el.textContent=fb;el.className='quiz-fb show '+(sel===ans?'good':'bad');
+}
+function doneLearn(i){
+  learnDone.add(i);
+  document.getElementById('ln-'+i).classList.add('done');
+  updateProg();
+  if(i<SECS.length-1)goLearn(i+1);else toast('🎉 All 19 sections complete!');
+}
+function updateProg(){
+  const pct=Math.round(learnDone.size/SECS.length*100);
+  document.getElementById('progInner').style.width=pct+'%';
+  document.getElementById('gProgress').textContent=learnDone.size+' / '+SECS.length+' complete';
+}
+
+// ══════════════════════════════════════
+// SIMULATE
+// ══════════════════════════════════════
+function selOpt(el){
+  const g=el.dataset.g;
+  document.querySelectorAll(`[data-g="${g}"]`).forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  cfg[g]=el.dataset.v;
+}
+function buildStages(){
+  const el=document.getElementById('stageList');el.innerHTML='';
+  STAGES.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='stage-it'+(i===0?' cur':'');d.id='st-'+i;
+    d.innerHTML=`<div class="stage-dot"></div><span>${s}</span>`;
+    el.appendChild(d);
+  });
+  updateStageBar();
+}
+function toggleStages(){
+  const list=document.getElementById('stageList');
+  const btn=document.getElementById('stageToggleBtn');
+  const open=list.style.display==='block';
+  list.style.display=open?'none':'block';
+  btn.textContent=open?'▸ Show':'▴ Hide';
+}
+function updateStageBar(){
+  const pct=Math.round(sim.stages.size/STAGES.length*100);
+  document.getElementById('stagePctBar').style.width=pct+'%';
+  document.getElementById('stagePctLabel').textContent=sim.stages.size+' / '+STAGES.length;
+  // Find current (highest completed) stage name
+  let curName='Not started';
+  for(let i=STAGES.length-1;i>=0;i--){
+    if(sim.stages.has(i)){curName=STAGES[i];break;}
+  }
+  const lbl=document.getElementById('stageCurrentName');
+  if(lbl)lbl.textContent=curName;
+}
+async function startSim(){
+  const btn=document.getElementById('startBtn');
+  btn.disabled=true;btn.textContent='Starting…';
+  document.getElementById('simSetup').style.display='none';
+  const sa=document.getElementById('simActive');sa.classList.add('on');
+  const sLabels={single:'Single Homeowner',couple:'Couple — One Skeptic',bids:'Has 2 Other Bids',insurance:'Insurance Deadline'};
+  const dLabels={easy:'Easy',realistic:'Realistic',hard:'Hard'};
+  const dCls={easy:'sb-easy',realistic:'sb-realistic',hard:'sb-hard'};
+  document.getElementById('sb-scenario').textContent=sLabels[cfg.scenario];
+  const db=document.getElementById('sb-diff');db.textContent=dLabels[cfg.diff];db.className='sbadge '+dCls[cfg.diff];
+  buildStages();
+  sim={running:true,msgs:[],exch:0,t0:Date.now(),timer:null,stages:new Set(),grades:[],won:false,coachLog:[]};
+  sim.timer=setInterval(()=>{
+    const e=Math.floor((Date.now()-sim.t0)/1000);
+    document.getElementById('simClock').textContent=Math.floor(e/60)+':'+(e%60<10?'0':'')+e%60;
+  },1000);
+  const sys=buildCustomerSys(cfg.scenario,cfg.diff,'sim');
+  const open=await claude([{role:'user',content:'[Start: you are a homeowner opening the door. Brief natural greeting as if answering the door, 1-2 sentences.]'}],sys);
+  if(!open){btn.disabled=false;btn.textContent='Start Simulation →';return;}
+  sim.msgs.push({role:'assistant',content:open});
+  addSimMsg('customer',open);
+  speakText(open,'cust');
+  btn.disabled=false;btn.textContent='Start Simulation →';
+}
+async function sendSim(){
+  const inp=document.getElementById('simInput');
+  const txt=inp.value.trim();if(!txt||!sim.running)return;
+  inp.value='';
+  sim.exch++;document.getElementById('simExch').textContent=sim.exch;
+  sim.msgs.push({role:'user',content:txt});
+  addSimMsg('rep',txt);
+  speakText(txt,'rep');
+  const sb=document.getElementById('simSend');sb.disabled=true;
+  showTyping('sim');
+  const sys=buildCustomerSys(cfg.scenario,cfg.diff,'sim');
+  const csys=buildCoachSys();
+  const [custR,scoreR]=await Promise.all([
+    claude(sim.msgs,sys),
+    claude([{role:'user',content:`Roofing sales rep said:\n"${txt}"\n\nScore and coach. JSON only:\n{"grade":"B","score":78,"stage":"Shingles","tip":"1-2 sentence tip.","customer_bought":false}`}],csys)
+  ]);
+  removeTyping('sim');
+  if(!custR){sb.disabled=false;return;}
+  sim.msgs.push({role:'assistant',content:custR});
+  addSimMsg('customer',custR);
+  showExchangeScore('sim',scoreR);
+  addCoachItem(scoreR);
+  updateStageTracking(scoreR);
+  updateAvgGrade();
+  speakText(custR,'cust');
+  try{const d=JSON.parse((scoreR||'').replace(/```json|```/g,'').trim());if(d.customer_bought){sim.won=true;setTimeout(()=>endSim(true),1500);}}catch(e){}
+  sb.disabled=false;
+}
+function addSimMsg(who,txt){
+  const c=document.getElementById('simMsgs');
+  const d=document.createElement('div');
+  d.className='msg-'+who;
+  const formattedTxt = who==='customer' ? formatBubble(txt) : autoFormat(escHtml(txt));
+  d.innerHTML=`<div class="msg-lbl">${who==='customer'?'🏠 Homeowner':'👤 You'}</div><div class="bubble">${formattedTxt}</div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+
+// Bold first sentence, rest normal weight
+function autoFormat(html){
+  // Split on first sentence boundary
+  const match = html.match(/^(.+?[.!?])\s+(.+)$/s);
+  if(match && match[2] && match[2].length > 10){
+    return `<span class="b-first">${match[1]}</span><span class="b-rest">${match[2]}</span>`;
+  }
+  return html; // short response stays as-is
+}
+
+function showExchangeScore(ctx,raw){
+  try{
+    const d=JSON.parse((raw||'').replace(/```json|```/g,'').trim());
+    const container=document.getElementById('simMsgs');
+    const gc=gradeColor(d.grade||'C');
+    const div=document.createElement('div');
+    div.className='exchange-score';
+    div.innerHTML=`<div class="es-top">
+      <div><div class="es-label">Response Grade</div><div class="es-grade ${gc}">${d.grade||'C'}</div></div>
+      <div style="text-align:right"><div class="es-label">Score</div><div class="es-points">${d.score||'—'} pts</div></div>
+    </div>
+    <div class="es-tip">${escHtml(d.tip||'')}</div>
+    <div class="es-stage">📍 Stage: ${escHtml(d.stage||'—')}</div>`;
+    container.appendChild(div);container.scrollTop=container.scrollHeight;
+    if(d.grade)sim.grades.push(d.grade);
+    // Store coaching for download
+    sim.coachLog = sim.coachLog || [];
+    sim.coachLog.push({grade:d.grade||'C',score:d.score,tip:d.tip||'',stage:d.stage||'—',exchange:sim.exch});
+  }catch(e){}
+}
+function gradeColor(g){const f=(g||'')[0]?.toUpperCase();return f==='A'?'grade-a':f==='B'?'grade-b':f==='C'?'grade-c':'grade-d';}
+
+function addCoachItem(raw){
+  try{
+    const d=JSON.parse((raw||'').replace(/```json|```/g,'').trim());
+    const feed=document.getElementById('coachFeed');
+    const q=(d.grade||'C')[0]?.toUpperCase();
+    const cls=q==='A'?'good':q==='B'?'tip':q==='C'?'warn':'bad';
+    const lbl={good:'✅ Excellent',tip:'👍 Good',warn:'⚠️ Improve',bad:'❌ Missed'}[cls];
+    const tips=(d.tip||'').split(/(?<=[.!?])\s+/).filter(s=>s.trim().length>2);
+    const bullets=tips.map(t=>`<li class="c-bullet"><span>${escHtml(t.trim())}</span></li>`).join('');
+    const item=document.createElement('div');
+    item.className=`c-item ${cls}`;
+    item.innerHTML=`<div class="c-lbl ${cls}">${lbl}</div>
+      <ul class="c-bullets">${bullets||`<li class="c-bullet"><span>${escHtml(d.tip||'')}</span></li>`}</ul>
+      ${d.stage?`<div class="c-stage-tag">📍 ${escHtml(d.stage)}</div>`:''}`;
+    feed.insertBefore(item,feed.firstChild);
+  }catch(e){}
+}
+
+function updateStageTracking(raw){
+  try{
+    const d=JSON.parse((raw||'').replace(/```json|```/g,'').trim());
+    const stageName=(d.stage||'').toLowerCase();
+    STAGES.forEach((s,i)=>{
+      if(s.toLowerCase().split(/\s/)[0]===stageName.split(/\s/)[0]||stageName.includes(s.toLowerCase().split(/\s/)[0])){
+        sim.stages.add(i);
+        const el=document.getElementById('st-'+i);
+        if(el)el.className='stage-it done';
+        const next=document.getElementById('st-'+(i+1));
+        if(next&&!sim.stages.has(i+1))next.className='stage-it cur';
+      }
+    });
+    updateStageBar();
+  }catch(e){}
+}
+function updateAvgGrade(){
+  if(!sim.grades.length)return;
+  const vals={A:4,B:3,C:2,D:1,F:0};
+  const avg=sim.grades.reduce((s,g)=>s+(vals[(g||'C')[0]]||2),0)/sim.grades.length;
+  document.getElementById('simAvgGrade').textContent=avg>=3.5?'A':avg>=2.5?'B':avg>=1.5?'C':'D';
+}
+async function endSim(won=false){
+  if(!sim.running)return;
+  sim.running=false;clearInterval(sim.timer);
+  const elapsed=Math.floor((Date.now()-sim.t0)/1000);
+  const time=Math.floor(elapsed/60)+':'+(elapsed%60<10?'0':'')+elapsed%60;
+  const stageCount=sim.stages.size;
+  const transcript=sim.msgs.slice(-8).map(m=>`${m.role==='user'?'REP':'CUSTOMER'}: ${m.content}`).join('\n');
+  const prompt=`You are a roofing sales coach evaluating a simulation.\n\nTranscript:\n${transcript}\n\nStages: ${stageCount}/${STAGES.length}, Exchanges: ${sim.exch}, Bought: ${won||sim.won}\n\nJSON only:\n{"score":82,"grade":"B+","summary":"One sentence.","positives":["p1","p2","p3"],"improvements":["i1","i2"],"closed":${won||sim.won}}`;
+  let data={score:won?88:Math.max(35,Math.round(stageCount/STAGES.length*80)),grade:won?'A-':'C+',summary:won?'Strong — successfully closed!':'Good effort but close needs work.',positives:['Professional opening','Good product knowledge'],improvements:['Work on objection handling','Practice price drops'],closed:won||sim.won};
+  try{const r=await claude([{role:'user',content:prompt}],'You are a sales trainer. Output ONLY valid JSON.');const clean=(r||'').replace(/```json|```/g,'').trim();data=JSON.parse(clean);}catch(e){}
+  showScorecard(data,time,stageCount);
+}
+function showScorecard(d,time,stages){
+  const s=d.score||0;
+  const sb=document.getElementById('scScore');
+  sb.textContent=s;sb.style.color=s>=80?'var(--green)':s>=60?'var(--gold2)':'var(--red)';
+  document.getElementById('scSub').textContent=d.summary||'';
+  document.getElementById('scGradeLbl').textContent=`${d.grade||'—'} — ${d.closed?'Deal Closed! 🎉':'No Close'}`;
+  document.getElementById('scGrid').innerHTML=`
+    <div class="sc-stat"><div class="sc-stat-lbl">Time</div><div class="sc-stat-val">${time}</div></div>
+    <div class="sc-stat"><div class="sc-stat-lbl">Stages</div><div class="sc-stat-val ${stages>=15?'g':stages>=10?'w':'b'}">${stages}/${STAGES.length}</div></div>
+    <div class="sc-stat"><div class="sc-stat-lbl">Exchanges</div><div class="sc-stat-val">${sim.exch}</div></div>
+    <div class="sc-stat"><div class="sc-stat-lbl">Result</div><div class="sc-stat-val ${d.closed?'g':'b'}">${d.closed?'Closed ✓':'No Close'}</div></div>`;
+  let fb=`<div class="sc-fb-ttl">Detailed Feedback</div>`;
+  (d.positives||[]).forEach(p=>{fb+=`<div class="sc-fb-item pos">✅ ${p}</div>`;});
+  (d.improvements||[]).forEach(p=>{fb+=`<div class="sc-fb-item neg">📌 ${p}</div>`;});
+  document.getElementById('scFb').innerHTML=fb;
+  document.getElementById('scOverlay').classList.add('show');
+}
+function closeScorecard(){document.getElementById('scOverlay').classList.remove('show');}
+function resetSim(){
+  closeScorecard();
+  document.getElementById('simActive').classList.remove('on');
+  document.getElementById('simSetup').style.display='';
+  document.getElementById('simMsgs').innerHTML='';
+  document.getElementById('coachFeed').innerHTML='<div class="c-item tip"><div class="c-lbl tip">Tip</div><ul class="c-bullets"><li class="c-bullet"><span>Start with your greeting — frame this as a team walkthrough, not a sales pitch.</span></li></ul></div>';
+  document.getElementById('simClock').textContent='0:00';
+  document.getElementById('simExch').textContent='0';
+  document.getElementById('simAvgGrade').textContent='—';
+  document.getElementById('stagePctBar').style.width='0%';
+  document.getElementById('stagePctLabel').textContent='0 / 19 stages';
+  sim={running:false,msgs:[],exch:0,t0:null,timer:null,stages:new Set(),grades:[],won:false,coachLog:[]};
+  document.getElementById('startBtn').disabled=false;
+  document.getElementById('startBtn').textContent='Start Simulation →';
+}
+
+// ══════════════════════════════════════
+// TYPING INDICATOR
+// ══════════════════════════════════════
+function showTyping(ctx){
+  const c=document.getElementById(ctx==='sim'?'simMsgs':'simMsgs');
+  const d=document.createElement('div');d.className='msg-customer';d.id=ctx+'-typing';
+  d.innerHTML='<div class="msg-lbl">🏠 Homeowner</div><div class="bubble"><div class="dots"><span></span><span></span><span></span></div></div>';
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function removeTyping(ctx){const e=document.getElementById(ctx+'-typing');if(e)e.remove();}
+
+// ══════════════════════════════════════
+// VOICE — TTS (OpenAI preferred, browser fallback) + MIC
+// ══════════════════════════════════════
+let selectedVoice=null;
+let voicesLoaded=false;
+let mic={on:false,rec:null};
+
+function loadVoices(){
+  const voices=window.speechSynthesis.getVoices();
+  if(!voices.length)return;
+  voicesLoaded=true;
+  selectedVoice=voices.find(v=>v.name==='Google US English')||voices.find(v=>v.lang==='en-US')||voices.find(v=>v.lang.startsWith('en'))||voices[0];
+}
+if('speechSynthesis' in window){window.speechSynthesis.onvoiceschanged=loadVoices;loadVoices();}
+
+function toggleTTS(who){
+  ttsEnabled[who]=!ttsEnabled[who];
+  const btnId=who==='cust'?'simCustTtsBtn':'simRepTtsBtn';
+  const btn=document.getElementById(btnId);
+  const labels={cust:['🔇 Customer','🔊 Customer'],rep:['🔇 You','🔊 You']};
+  btn.textContent=ttsEnabled[who]?labels[who][1]:labels[who][0];
+  btn.classList.toggle('tts-on',ttsEnabled[who]);
+  if(!ttsEnabled[who]&&isSpeaking){window.speechSynthesis.cancel();isSpeaking=false;removeSpeakingIndicator();}
+  toast(ttsEnabled[who]?`🔊 ${who==='cust'?'Customer':'Your'} voice ON`:`🔇 ${who==='cust'?'Customer':'Your'} voice OFF`);
+}
+
+async function speakText(txt,who){
+  if(!ttsEnabled[who])return;
+  if(OPENAI_KEY){await speakOpenAI(txt,who);}
+  else{speakBrowser(txt,who);}
+}
+
+async function speakOpenAI(txt,who){
+  isSpeaking=true;showSpeakingIndicator(who);
+  if(mic.on){try{mic.rec&&mic.rec.stop();}catch(e){}mic.on=false;}
+  const clean=cleanTextForTTS(txt);
+  try{
+    const r=await fetch('https://api.openai.com/v1/audio/speech',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+OPENAI_KEY},
+      body:JSON.stringify({model:'tts-1',voice:who==='cust'?'onyx':'shimmer',input:clean,speed:0.92})
+    });
+    if(!r.ok)throw new Error('OpenAI TTS error');
+    const blob=await r.blob();
+    const url=URL.createObjectURL(blob);
+    const audio=new Audio(url);
+    audio.onended=()=>{isSpeaking=false;removeSpeakingIndicator();URL.revokeObjectURL(url);};
+    audio.onerror=()=>{isSpeaking=false;removeSpeakingIndicator();};
+    audio.play();
+  }catch(e){
+    isSpeaking=false;removeSpeakingIndicator();
+    speakBrowser(txt,who); // fallback
+  }
+}
+
+function speakBrowser(txt,who){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  isSpeaking=true;showSpeakingIndicator(who);
+  if(mic.on){try{mic.rec&&mic.rec.stop();}catch(e){}mic.on=false;}
+  const parts=[];
+  const re=/\*([^*]+)\*/g;let last=0,m;
+  while((m=re.exec(txt))!==null){
+    if(m.index>last)parts.push({text:txt.slice(last,m.index),isDir:false});
+    parts.push({text:m[1],isDir:true});last=re.lastIndex;
+  }
+  if(last<txt.length)parts.push({text:txt.slice(last),isDir:false});
+  const queue=[];
+  parts.forEach(p=>{
+    const cleaned=p.isDir?p.text.replace(/[.,!?;:]/g,' ').trim():cleanTextForTTS(p.text);
+    if(!cleaned)return;
+    const sentences=cleaned.match(/[^.!?]+[.!?]*/g)||[cleaned];
+    sentences.forEach(s=>{if(s.trim())queue.push({text:s.trim(),isDir:p.isDir});});
+  });
+  let idx=0;
+  function next(){
+    if(idx>=queue.length){isSpeaking=false;removeSpeakingIndicator();return;}
+    const{text,isDir}=queue[idx++];
+    const u=new SpeechSynthesisUtterance(text);
+    u.rate=isDir?0.75:0.88;u.pitch=isDir?0.70:0.82;u.volume=isDir?0.7:1.0;
+    if(selectedVoice)u.voice=selectedVoice;
+    u.onend=next;u.onerror=()=>{isSpeaking=false;removeSpeakingIndicator();};
+    window.speechSynthesis.speak(u);
+  }
+  next();
+}
+
+function showSpeakingIndicator(who){
+  const c=document.getElementById('simMsgs');if(!c)return;
+  removeSpeakingIndicator();
+  const d=document.createElement('div');
+  d.id='speakingIndicator';d.className=who==='cust'?'msg-customer':'msg-rep';
+  d.innerHTML=`<div class="speaking-indicator"><div class="speaking-dot"></div><span>${who==='cust'?'Customer':'You'} speaking…</span></div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function removeSpeakingIndicator(){const el=document.getElementById('speakingIndicator');if(el)el.remove();}
+
+function cleanTextForTTS(text){
+  return text.replace(/\*[^*]+\*/g,'').replace(/[.,!?;:]/g,' ').replace(/--/g,' ').replace(/\s{2,}/g,' ').trim();
+}
+
+function testVoice(){
+  const sample="Hi there, I've been thinking about replacing my roof for a while now. Come on in.";
+  if(OPENAI_KEY){
+    ttsEnabled.cust=true;speakText(sample,'cust');
+    toast('🔊 Playing via OpenAI TTS…');
+  } else {
+    speakBrowser(sample,'cust');
+    toast('🔊 Playing browser TTS — add OpenAI key in Settings for natural voice');
+  }
+}
+
+async function toggleMic(ctx){
+  const btn=document.getElementById('simMic');
+  const inp=document.getElementById('simInput');
+  if(isSpeaking){toast('⏳ Wait for speaking to finish.');return;}
+  if(mic.on){try{mic.rec&&mic.rec.stop();}catch(e){}mic.on=false;btn.classList.remove('listening');return;}
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){toast('🎤 Voice input requires Chrome or Edge.');return;}
+  try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());}
+  catch(err){
+    const msgs={'NotAllowedError':'🚫 Mic blocked — click 🔒 in address bar → Allow Microphone.','NotFoundError':'🎤 No microphone found.'};
+    toast(msgs[err.name]||'🎤 Mic error: '+err.message);return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  mic.rec=new SR();mic.rec.continuous=true;mic.rec.interimResults=true;mic.rec.lang='en-US';mic.rec.maxAlternatives=1;
+  mic.rec.onstart=()=>{mic.on=true;btn.classList.add('listening');toast('🎤 Listening — tap mic again to stop & send');};
+  mic.rec.onresult=e=>{let i='',f='';for(let j=e.resultIndex;j<e.results.length;j++){if(e.results[j].isFinal)f+=e.results[j][0].transcript;else i+=e.results[j][0].transcript;}inp.value=f||i;};
+  mic.rec.onerror=e=>{mic.on=false;btn.classList.remove('listening');const msgs={'not-allowed':'🚫 Mic denied.','no-speech':'🎤 No speech detected.','audio-capture':'🎤 No mic found.','aborted':''};const m=msgs[e.error]||'🎤 Error: '+e.error;if(m)toast(m);};
+  mic.rec.onend=()=>{mic.on=false;btn.classList.remove('listening');if(inp.value.trim())sendSim();};
+  try{mic.rec.start();}catch(e){toast('🎤 Could not start mic: '+e.message);}
+}
+
+async function testMicPermission(){
+  try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());toast('✅ Mic working and permitted!');}
+  catch(err){
+    if(err.name==='NotAllowedError')toast('🚫 Mic blocked. Click 🔒 in address bar → Site Settings → Allow Microphone.');
+    else if(err.name==='NotFoundError')toast('🎤 No mic detected. Check hardware.');
+    else toast('❌ Mic error: '+err.message);
+  }
+}
+
+// ══════════════════════════════════════
+// SETTINGS PAGE
+// ══════════════════════════════════════
+function showSettingsPanel(id,el){
+  document.querySelectorAll('.settings-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.settings-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sp-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+function showSettingsPanel(id,el){
+  document.querySelectorAll('.settings-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.settings-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sp-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+function openSettings(){
+  initSettingsPage();
+  document.getElementById('settingsOverlay').classList.add('show');
+}
+function closeSettings(){
+  document.getElementById('settingsOverlay').classList.remove('show');
+}
+
+function initSettingsPage(){
+  const akInput=document.getElementById('settingsAnthropicKey');
+  const oaInput=document.getElementById('settingsOpenAIKey');
+  if(akInput&&ANTHROPIC_KEY)akInput.value=ANTHROPIC_KEY;
+  if(oaInput&&OPENAI_KEY)oaInput.value=OPENAI_KEY;
+  const lbl=document.getElementById('activeVoiceLabel');
+  if(lbl)lbl.textContent=OPENAI_KEY?'Using OpenAI TTS (onyx — natural male voice)':'Using browser TTS (add OpenAI key for natural voice)';
+  buildScriptEditor();
+  buildPersonaEditor();
+}
+
+// ══════════════════════════════════════
+// DOWNLOAD SESSION
+// ══════════════════════════════════════
+function downloadSession(format){
+  const msgs=sim.msgs||[];
+  const coach=sim.coachLog||[];
+  const score=document.getElementById('scScore')?.textContent||'—';
+  const grade=document.getElementById('scGradeLbl')?.textContent||'—';
+  const summary=document.getElementById('scSub')?.textContent||'—';
+  const date=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const time=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+
+  if(format==='txt'){
+    let out=`ROOFVANTAGE TRAINING SESSION\n${date} ${time}\n${'='.repeat(50)}\n\nFINAL SCORE: ${score}  |  ${grade}\n${summary}\n\n${'='.repeat(50)}\n\nCONVERSATION TRANSCRIPT\n${'─'.repeat(50)}\n\n`;
+    msgs.forEach(m=>{out+=(m.role==='user'?'YOU (Rep)':'HOMEOWNER')+':\n'+m.content.replace(/\*([^*]+)\*/g,'[$1]')+'\n\n';});
+    out+=`${'='.repeat(50)}\nLIVE COACHING LOG\n${'─'.repeat(50)}\n\n`;
+    coach.forEach(c=>{out+=`Exchange ${c.exchange} — Grade: ${c.grade}  Score: ${c.score} pts  Stage: ${c.stage}\n${c.tip}\n\n`;});
+    triggerDownload(new Blob([out],{type:'text/plain'}),`RoofVantage-Session-${date.replace(/ /g,'-')}.txt`);
+
+  } else {
+    const msgHtml=msgs.map(m=>{
+      const you=m.role==='user';
+      const txt=(m.content||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*([^*]+)\*/g,'<em style="color:#888">[$1]</em>');
+      return `<div style="margin-bottom:14px;display:flex;flex-direction:column;align-items:${you?'flex-end':'flex-start'}"><div style="font-size:11px;color:#888;margin-bottom:3px;">${you?'👤 You':'🏠 Homeowner'}</div><div style="max-width:78%;padding:11px 14px;border-radius:10px;font-size:14px;line-height:1.65;${you?'background:#003865;color:#fff;':'background:#fff;border:1px solid #dde0e8;color:#1a2540;'}">${txt}</div></div>`;
+    }).join('');
+    const coachHtml=coach.map(c=>{
+      const col={A:'#1a9e6a',B:'#ED8800',C:'#c47a00',D:'#d94040',F:'#d94040'}[c.grade[0]]||'#888';
+      return `<div style="background:#fff;border:1px solid #dde0e8;border-left:3px solid ${col};border-radius:8px;padding:12px 14px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:22px;font-weight:800;color:${col};">${c.grade}</span><span style="font-size:13px;color:#888;">${c.score} pts · Exchange ${c.exchange}</span></div><div style="font-size:14px;color:#1a2540;font-weight:500;margin-bottom:5px;">${(c.tip||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div><div style="font-size:11px;color:#888;">📍 ${c.stage}</div></div>`;
+    }).join('');
+    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RoofVantage Session — ${date}</title><style>body{font-family:'Helvetica Neue',sans-serif;background:#f5f6f8;margin:0;padding:0;}.wrap{max-width:900px;margin:0 auto;padding:32px 24px;}h1{font-size:28px;color:#003865;margin-bottom:4px;}h2{font-size:16px;font-weight:700;color:#003865;margin:28px 0 12px;padding-bottom:8px;border-bottom:2px solid #ED8800;}.score-box{background:#003865;color:#fff;border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:24px;margin-bottom:24px;}.score-num{font-size:56px;font-weight:800;line-height:1;}.score-info{font-size:14px;opacity:0.85;}.score-grade{font-size:20px;font-weight:700;margin-bottom:4px;}</style></head><body><div class="wrap"><h1>RoofVantage Training Session</h1><p style="color:#888;font-size:13px;margin-bottom:20px;">${date} at ${time}</p><div class="score-box"><div class="score-num">${score}</div><div class="score-info"><div class="score-grade">${grade}</div><div>${summary}</div></div></div><h2>Conversation Transcript</h2><div>${msgHtml}</div><h2>Live Coaching Log</h2><div>${coachHtml}</div></div></body></html>`;
+    triggerDownload(new Blob([html],{type:'text/html'}),`RoofVantage-Session-${date.replace(/ /g,'-')}.html`);
+  }
+}
+
+function triggerDownload(blob,filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast('📥 Downloaded: '+filename);
+}
+
+function buildScriptEditor(){
+  const el=document.getElementById('scriptEditorList');
+  if(!el||el.dataset.built)return;
+  el.dataset.built='1';
+  SECS.forEach((s,si)=>{
+    const div=document.createElement('div');
+    div.className='script-ed-section';
+    const sayLines=s.lines.filter(l=>l.t==='say'||l.t==='ask'||l.t==='close');
+    div.innerHTML=`<div class="script-ed-hdr" onclick="toggleScriptSection(this,${si})">
+      <span class="script-ed-title">${s.id}. ${s.title}</span>
+      <span class="script-ed-badge">${sayLines.length} lines</span>
+    </div>
+    <div class="script-ed-body" id="sed-${si}"></div>`;
+    el.appendChild(div);
+    const body=div.querySelector('.script-ed-body');
+    let lineHtml='';
+    s.lines.forEach((l,li)=>{
+      if(l.t!=='say'&&l.t!=='ask'&&l.t!=='close')return;
+      const key=si+'_'+li;
+      const val=customLines[key]||l.txt;
+      lineHtml+=`<div class="script-line-ed">
+        <div class="script-line-lbl">${({say:'SAY',ask:'ASK',close:'CLOSE'})[l.t]}${l.tag2?' — '+l.tag2:''}</div>
+        <textarea class="script-line-ta" id="slt-${si}-${li}" rows="2">${escHtml(val)}</textarea>
+      </div>`;
+    });
+    lineHtml+=`<div class="script-ed-actions">
+      <button class="script-ed-save" onclick="saveScriptSection(${si})">Save Changes</button>
+      <button class="script-ed-reset" onclick="resetScriptSection(${si})">Reset to Original</button>
+      <span class="script-ed-saved" id="ses-${si}">✓ Saved</span>
+    </div>`;
+    body.innerHTML=lineHtml;
+  });
+}
+
+function toggleScriptSection(hdr,si){
+  const body=document.getElementById('sed-'+si);
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  hdr.classList.toggle('open',!open);
+}
+
+function saveScriptSection(si){
+  SECS[si].lines.forEach((l,li)=>{
+    if(l.t!=='say'&&l.t!=='ask'&&l.t!=='close')return;
+    const ta=document.getElementById(`slt-${si}-${li}`);
+    if(ta){
+      const key=si+'_'+li;
+      customLines[key]=ta.value.trim();
+    }
+  });
+  try{localStorage.setItem('rv_customLines',JSON.stringify(customLines));}catch(e){}
+  const saved=document.getElementById('ses-'+si);
+  if(saved){saved.style.display='inline-flex';setTimeout(()=>saved.style.display='none',2000);}
+  toast('✅ Script section saved');
+}
+
+function resetScriptSection(si){
+  SECS[si].lines.forEach((l,li)=>{
+    const key=si+'_'+li;
+    delete customLines[key];
+    const ta=document.getElementById(`slt-${si}-${li}`);
+    if(ta)ta.value=l.txt;
+  });
+  try{localStorage.setItem('rv_customLines',JSON.stringify(customLines));}catch(e){}
+  toast('↩️ Section reset to original');
+}
+
+function buildPersonaEditor(){
+  const el=document.getElementById('personaEditorList');
+  if(!el||el.dataset.built)return;
+  el.dataset.built='1';
+  const scenarios=[
+    {key:'single',label:'Single Homeowner',icon:'🏠'},
+    {key:'couple',label:'Couple — One Skeptic',icon:'👫'},
+    {key:'bids',label:'Already Has 2 Bids',icon:'📋'},
+    {key:'insurance',label:'Insurance Deadline',icon:'⏰'}
+  ];
+  scenarios.forEach(s=>{
+    const div=document.createElement('div');
+    div.className='persona-ed';
+    div.innerHTML=`<div class="persona-ed-title">${s.icon} ${s.label}</div>
+      <div class="persona-ed-sub">Describe who this customer is. This goes directly into the AI's instructions.</div>
+      <textarea class="persona-ed-ta" id="ped-${s.key}" rows="4">${escHtml(customPersonas[s.key]||DEFAULT_PERSONAS[s.key])}</textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="script-ed-save" onclick="savePersona('${s.key}')">Save</button>
+        <button class="script-ed-reset" onclick="resetPersona('${s.key}')">Reset</button>
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
+function savePersona(key){
+  const ta=document.getElementById('ped-'+key);
+  if(ta)customPersonas[key]=ta.value.trim();
+  try{localStorage.setItem('rv_personas',JSON.stringify(customPersonas));}catch(e){}
+  toast('✅ Persona saved');
+}
+function resetPersona(key){
+  customPersonas[key]=DEFAULT_PERSONAS[key];
+  const ta=document.getElementById('ped-'+key);
+  if(ta)ta.value=DEFAULT_PERSONAS[key];
+  try{localStorage.setItem('rv_personas',JSON.stringify(customPersonas));}catch(e){}
+  toast('↩️ Persona reset');
+}
+
+async function testSettingsKey(which){
+  const val=document.getElementById(which==='anthropic'?'settingsAnthropicKey':'settingsOpenAIKey').value.trim();
+  const statusEl=document.getElementById(which==='anthropic'?'anthropicKeyStatus':'openaiKeyStatus');
+  if(!val){statusEl.innerHTML='<span style="color:var(--red)">Enter a key first.</span>';return;}
+  statusEl.innerHTML='<span style="color:var(--muted)">⏳ Testing…</span>';
+  if(which==='anthropic'){
+    try{
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':val,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'Hi'}]})});
+      const d=await r.json();
+      if(d.error)statusEl.innerHTML=`<span style="color:var(--red)">❌ ${d.error.type==='authentication_error'?'Key rejected — check it\'s correct.':d.error.message}</span>`;
+      else statusEl.innerHTML='<span style="color:var(--green)">✅ Valid and working!</span>';
+    }catch(e){statusEl.innerHTML='<span style="color:var(--red)">🌐 Network error</span>';}
+  } else {
+    try{
+      const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+val}});
+      if(r.ok)statusEl.innerHTML='<span style="color:var(--green)">✅ Valid OpenAI key — natural voice enabled!</span>';
+      else statusEl.innerHTML='<span style="color:var(--red)">❌ Key rejected by OpenAI.</span>';
+    }catch(e){statusEl.innerHTML='<span style="color:var(--red)">🌐 Network error</span>';}
+  }
+}
+
+function saveSettingsKey(which){
+  const val=document.getElementById(which==='anthropic'?'settingsAnthropicKey':'settingsOpenAIKey').value.trim();
+  if(!val)return;
+  if(which==='anthropic'){
+    if(!val.startsWith('sk-ant')){toast('❌ Anthropic key should start with sk-ant-');return;}
+    ANTHROPIC_KEY=val;
+    try{localStorage.setItem('rv_apikey',val);}catch(e){}
+    toast('✅ Anthropic key saved');
+  } else {
+    if(!val.startsWith('sk-')){toast('❌ OpenAI key should start with sk-');return;}
+    OPENAI_KEY=val;
+    try{localStorage.setItem('rv_oaikey',val);}catch(e){}
+    const lbl=document.getElementById('activeVoiceLabel');
+    if(lbl)lbl.textContent='Using OpenAI TTS (onyx)';
+    document.getElementById('voiceStatusLabel').textContent='OpenAI TTS active — natural voice enabled';
+    toast('✅ OpenAI key saved — natural voice active!');
+  }
+}
+
+// ══════════════════════════════════════
+// API KEY MODAL (first-run)
+// ══════════════════════════════════════
+function openKeyModal(isError=false){
+  const overlay=document.getElementById('apikeyOverlay');
+  const title=document.getElementById('apikeyTitle');
+  const sub=document.getElementById('apikeySubtitle');
+  const input=document.getElementById('apikeyInput');
+  const status=document.getElementById('apikeyStatus');
+  if(ANTHROPIC_KEY)input.value=ANTHROPIC_KEY;
+  title.textContent=isError?'API Key Issue':ANTHROPIC_KEY?'Update API Key':'Welcome to RoofVantage Trainer';
+  sub.textContent=isError?'There was a problem connecting. Check your key below.':ANTHROPIC_KEY?'Your current key is shown. Replace or test it.':'This app uses the Anthropic Claude API. Each person needs their own free key.';
+  status.innerHTML='';
+  overlay.classList.add('show');
+  setTimeout(()=>input.focus(),100);
+}
+function setKeyStatus(msg,type){
+  const el=document.getElementById('apikeyStatus');
+  const colors={ok:'var(--green)',err:'var(--red)',info:'var(--blue)',loading:'var(--muted)'};
+  const icons={ok:'✅',err:'❌',info:'ℹ️',loading:'⏳'};
+  el.innerHTML=`<span style="color:${colors[type]}">${icons[type]} ${msg}</span>`;
+}
+async function testApiKey(){
+  const val=document.getElementById('apikeyInput').value.trim();
+  if(!val){setKeyStatus('Enter a key first.','err');return;}
+  const btn=document.getElementById('apikeyTestBtn');
+  btn.disabled=true;btn.textContent='Testing…';
+  setKeyStatus('Testing…','loading');
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':val,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'Hi'}]})});
+    const d=await r.json();
+    if(d.error){const msg=d.error.type==='authentication_error'?'Key rejected.':d.error.message||'API error.';setKeyStatus(msg,'err');}
+    else{setKeyStatus('Key is valid and working!','ok');document.getElementById('apikeySaveBtn').style.background='var(--green)';}
+  }catch(e){setKeyStatus('Network error — check your connection.','err');}
+  btn.disabled=false;btn.textContent='Test Key';
+}
+function saveApiKey(){
+  const val=document.getElementById('apikeyInput').value.trim();
+  if(!val){setKeyStatus('Please enter a key.','err');return;}
+  if(!val.startsWith('sk-ant')){setKeyStatus('Key should start with sk-ant — check for typos.','err');return;}
+  ANTHROPIC_KEY=val;
+  if(document.getElementById('apikeyRemember').checked){try{localStorage.setItem('rv_apikey',val);}catch(e){}}
+  else{try{localStorage.removeItem('rv_apikey');}catch(e){}}
+  document.getElementById('apikeyOverlay').classList.remove('show');
+  document.getElementById('apikeySaveBtn').style.background='';
+  toast('✅ API key saved — ready to train!');
+}
+function loadApiKey(){
+  try{
+    const ak=localStorage.getItem('rv_apikey');
+    if(ak&&ak.startsWith('sk-ant')){ANTHROPIC_KEY=ak;document.getElementById('apikeyOverlay').classList.remove('show');}
+    const ok=localStorage.getItem('rv_oaikey');
+    if(ok&&ok.startsWith('sk-')){OPENAI_KEY=ok;}
+    const cl=localStorage.getItem('rv_customLines');
+    if(cl)customLines=JSON.parse(cl);
+    const cp=localStorage.getItem('rv_personas');
+    if(cp)customPersonas={...DEFAULT_PERSONAS,...JSON.parse(cp)};
+  }catch(e){}
+  if(OPENAI_KEY)document.getElementById('voiceStatusLabel').textContent='OpenAI TTS active — natural voice enabled';
+}
+document.getElementById('apikeyInput').addEventListener('keydown',e=>{if(e.key==='Enter')saveApiKey();});
+
+// ══════════════════════════════════════
+// CLAUDE API
+// ══════════════════════════════════════
+async function claude(msgs,sys){
+  if(!ANTHROPIC_KEY){openKeyModal(false);return null;}
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:sys,messages:msgs})});
+    const d=await r.json();
+    if(d.error){
+      const et=d.error.type||'';
+      if(et==='authentication_error'){toast('❌ Invalid API key. Tap ⚙️ to update.');openKeyModal(true);}
+      else if(et==='rate_limit_error')toast('⏳ Rate limit — wait a moment and try again.');
+      else if(et==='overloaded_error')toast('🔄 Claude is busy — retry in a few seconds.');
+      else toast('API error: '+(d.error.message||et));
+      return null;
+    }
+    if(d.content&&d.content[0])return d.content[0].text;
+    return "I'm sorry, could you say that again?";
+  }catch(e){toast('🌐 Network error — check your connection.');return null;}
+}
+
+// ══════════════════════════════════════
+// AI SYSTEM PROMPTS
+// ══════════════════════════════════════
+function buildCustomerSys(scenario,diff,mode){
+  const diffMap={
+    easy:"You are friendly and open. 1-2 mild concerns. Willing to move forward if the rep does a decent job.",
+    realistic:"You are a typical cautious homeowner with 3-4 real objections: price is high, you want to think about it, spouse needs to be involved, bad past contractor experiences. Respond well to good answers but push back on weak ones.",
+    hard:"You are skeptical and price-obsessed. You've been burned by contractors before. Challenge price constantly, threaten other bids, say your buddy could do it cheaper. Only excellent responses will satisfy you."
+  };
+  const objMap={price:"Focus heavily on price objections.",bids:"Keep threatening to get other bids.",spouse:"Say your spouse isn't home and you can't decide alone.",all:"Mix all objection types naturally."};
+  return `You are roleplaying as a homeowner in a sales training simulation for RoofVantage, a roofing company in Raleigh and Wilmington NC.
+
+PERSONA: ${customPersonas[scenario]||DEFAULT_PERSONAS[scenario]}
+DIFFICULTY: ${diffMap[diff]||diffMap.realistic}
+OBJECTION STYLE: ${objMap[cfg.obj]||objMap.all}
+
+RULES:
+- Stay in character AT ALL TIMES. Never break the fourth wall.
+- Respond naturally as a real homeowner — short to medium responses, conversational.
+- React authentically: warm up to good explanations, push back on vague or pushy responses.
+- Raise objections organically — don't dump them all at once.
+- If rep handles an objection well, reduce resistance slightly.
+- If rep attempts assumption close ("cash or check") after doing a good job, agree to the deposit.
+- Keep responses to 2-4 sentences. Be a real person.
+- Express reactions and emotions using *asterisks* e.g. *sighs*, *looks skeptical*, *nods slowly*`;
+}
+function buildCoachSys(){
+  return `You are an expert roofing sales coach for RoofVantage (Raleigh & Wilmington NC). You know the 19-section script deeply.
+Sections: Introduction, Industry Stats, Company Types, Credentials, Project Manager, Mission, Shingles, Warranty, Installation Day, Decking, Flashing, Underlayment, Synthetic, Drip Edge, Starter/Wind, Shingle Tech, Cleanup, Pre-Close (3 yeses), Pricing (4 drops: 1-year→30-day→same-day→CertainTeed bucks).
+Key tactics: rapport first, get micro-yeses, never cut price without a story, assumption close ("cash or check?"), uncover real objection before going to next price level.
+Grades: A=perfect, B=good, C=adequate missed opportunity, D=weak/off-script.
+Respond ONLY with valid JSON. No preamble, no markdown.`;
+}
+
+// ══════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg,dur=3000){const t=document.getElementById('toast');t.textContent=msg;t.className='toast on';setTimeout(()=>t.className='toast',dur);}
+function formatBubble(text){
+  const html=escHtml(text).replace(/\*([^*]+)\*/g,'<span class="stage-dir">[$1]</span>');
+  return autoFormat(html);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+buildLearn();
+updateProg();
+loadApiKey();
+</script>
+</body>
+</html>
