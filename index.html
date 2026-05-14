@@ -1,90 +1,5 @@
 <!DOCTYPE html>
-<!--
-═══════════════════════════════════════════════════════════════════════════════
- ROOFVANTAGE SALES TRAINER — MODIFICATION GUIDE FOR AI EDITORS
-═══════════════════════════════════════════════════════════════════════════════
-
- If you are an AI (ChatGPT, Grok, Claude, etc.) editing this file, read this first.
-
- ARCHITECTURE
- ────────────
- Single-file HTML app. No build step. Open directly in browser or host on
- GitHub Pages / Netlify. All state in localStorage. No backend.
-
- FILE LAYOUT (search for these headers to jump to sections)
- ──────────────────────────────────────────────────────────
-   <style>                              ← all CSS
-     /* ════════ SHARED CHAT UI ════════ */
-     /* ════════ SIMULATE ════════ */
-     /* SCORECARD */
-     /* API KEY MODAL */
-     /* SETTINGS MODAL */
-   
-/* VERSION BADGE */
-.version-badge{
-  position:fixed;bottom:8px;right:10px;z-index:50;
-  font-size:10px;color:var(--muted);letter-spacing:1px;
-  background:rgba(255,255,255,0.85);
-  border:1px solid var(--border);border-radius:99px;
-  padding:2px 8px;font-family:'DM Sans',sans-serif;
-  pointer-events:none;user-select:none;
-}
-</style>
-
-   <body>
-     <!-- API KEY MODAL -->                 ← first-run key entry
-     <!-- HEADER -->                        ← logo + tabs + gear
-     <!-- APP BODY -->
-       <!-- ══ PRACTICE (simulate) ══ -->    ← THE ONLY TAB
-       <!-- ══ SETTINGS MODAL ══ -->         ← gear opens this
-     <!-- SCORECARD -->                     ← post-session results
-
-   <script>
-     // DATA: SECS (19-section script) + STAGES (used by AI coach)
-     // STATE
-     // TABS
-     // SIMULATE              ← main session logic
-     // VOICE — TTS + MIC     ← ElevenLabs → OpenAI → browser fallback
-     // SETTINGS PAGE
-     // DOWNLOAD SESSION
-     // API KEY MODAL (first-run)
-     // CLAUDE API
-     // AI SYSTEM PROMPTS
-     // UTILITIES
-     // INIT
-   </script>
-
- KEY FUNCTIONS
- ─────────────
-   startSim()              kicks off a practice session
-   sendSim()               handles each rep response + AI customer reply
-   speakText(txt, who)     unified TTS entry — 'cust' or 'rep'
-   toggleMic('sim')        mic on/off for input
-   downloadSession(fmt)    'txt' or 'html' export with full coaching log
-   claude(msgs, sys)       wrapper for the Anthropic API
-
- API KEYS
- ────────
- Stored in localStorage keys: rv_apikey (Anthropic), rv_oaikey (OpenAI),
- rv_elkey (ElevenLabs). Never written into the file.
-
- AI MODELS
- ─────────
- Main: claude-sonnet-4-5
- Key test: claude-haiku-4-5
- If you need to change these, search for "claude-" in the script.
-
- ADDING A NEW FEATURE
- ────────────────────
- 1. Find the right section header above and add nearby.
- 2. State variables go near the // STATE block.
- 3. New buttons go in the topbar (#simActive .sim-topbar) or the Settings modal.
- 4. Don't duplicate state — reuse `sim`, `cfg`, `ttsEnabled`, `mic`.
- 5. Bump APP_VERSION at the bottom of the script.
-
- VERSION: see APP_VERSION constant in script (also shown as a badge bottom-right).
-═══════════════════════════════════════════════════════════════════════════════
--->
+<!-- RoofVantage Sales Trainer | AI editors: read AI_GUIDE.md for architecture and modification instructions | Version constant: APP_VERSION near top of script tag -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -535,6 +450,17 @@ body{
   z-index:300;display:flex;flex-direction:column;
   transform:translateX(100%);transition:transform 0.3s ease;
 }
+/* v15: full-width on small screens so close button is reachable */
+@media (max-width: 600px){
+  .qa-drawer{width:100vw;}
+}
+/* v15: dim background when drawer open */
+.qa-backdrop{
+  position:fixed;inset:0;background:rgba(0,30,60,0.4);
+  z-index:299;opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.qa-backdrop.show{opacity:1;pointer-events:auto;}
 .qa-drawer.open{transform:translateX(0);}
 .qa-hdr{
   background:var(--navy);padding:14px 18px;display:flex;
@@ -708,6 +634,16 @@ body{
   background:var(--gold2);flex-shrink:0;
   animation:pulse 1.2s ease-in-out infinite;
 }
+
+/* VERSION BADGE */
+.version-badge{
+  position:fixed;bottom:8px;right:10px;z-index:50;
+  font-size:10px;color:var(--muted);letter-spacing:1px;
+  background:rgba(255,255,255,0.85);
+  border:1px solid var(--border);border-radius:99px;
+  padding:2px 8px;font-family:'DM Sans',sans-serif;
+  pointer-events:none;user-select:none;
+}
 </style>
 
 </head>
@@ -815,7 +751,7 @@ body{
           <div><div class="sstat-val" id="simAvgGrade">—</div><div class="sstat-lbl">Avg Grade</div></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
-          <button id="simCustTtsBtn" onclick="toggleTTS('cust')" title="Read customer responses aloud" class="tts-toggle-btn">🔇 Customer</button>
+          <button id="simCustTtsBtn" onclick="toggleTTS('cust')" title="Read customer responses aloud" class="tts-toggle-btn tts-on">🔊 Customer</button>
           <button id="simRepTtsBtn"  onclick="toggleTTS('rep')"  title="Read your responses aloud"    class="tts-toggle-btn">🔇 You</button>
           <button class="btn-reset-conv" onclick="resetConversation()" title="Erase chat and coaching but keep current scenario">↺ Reset</button>
           <button class="btn-end" onclick="endSim()">End & Score</button>
@@ -1049,14 +985,14 @@ const STAGES = ["Introduction","Industry Stats","Company Types","Credentials","P
 // ══════════════════════════════════════
 // APP VERSION (single source of truth — bump on every release)
 // ══════════════════════════════════════
-const APP_VERSION = 'v13';
+const APP_VERSION = 'v15';
 
 // ══════════════════════════════════════
 // STATE
 // ══════════════════════════════════════
 let cfg={scenario:'single',diff:'realistic',voice:'text',obj:'all'};
 let sim={running:false,msgs:[],exch:0,t0:null,timer:null,stages:new Set(),grades:[],won:false,coachLog:[],lastExchangeId:null};
-let ttsEnabled={cust:false,rep:false};
+let ttsEnabled={cust:true,rep:false};  // v15: customer voice ON by default
 let isSpeaking=false;
 let OPENAI_KEY='';
 let ELEVENLABS_KEY='';
@@ -1158,7 +1094,9 @@ async function sendSim(){
   sim.lastExchangeId=exchangeId;
   sim.msgs.push({role:'user',content:txt,exchangeId});
   addSimMsg('rep',txt,exchangeId);
-  speakText(txt,'rep');
+  await speakText(txt,'rep'); // v15: await so we don't overlap with customer reply
+  // v15: clear the recording so it's not reused
+  if(lastRepAudioURL){URL.revokeObjectURL(lastRepAudioURL);lastRepAudioURL=null;}
   const sb=document.getElementById('simSend');sb.disabled=true;
   showTyping('sim');
   const sys=buildCustomerSys(cfg.scenario,cfg.diff,'sim');
@@ -1303,8 +1241,10 @@ async function retryResponse(exchangeId){
 let qaHistory=[];
 function toggleQA(){
   const drawer=document.getElementById('qaDrawer');
+  const backdrop=document.getElementById('qaBackdrop');
   const btn=document.getElementById('qaToggleBtn');
   const isOpen=drawer.classList.toggle('open');
+  if(backdrop)backdrop.classList.toggle('show',isOpen);
   btn.classList.toggle('active',isOpen);
   if(isOpen){
     setTimeout(()=>document.getElementById('qaInput').focus(),300);
@@ -1436,10 +1376,12 @@ function resetSim(){
 async function resetConversation(){
   if(!sim.running){toast('No active conversation to reset.');return;}
   if(!confirm('Reset this conversation? Your chat, coaching, and scores will be erased but the same scenario continues.'))return;
-  // Stop any audio
-  if(window.speechSynthesis)window.speechSynthesis.cancel();
-  isSpeaking=false;removeSpeakingIndicator();
+  // Stop any audio (v15: stops ElevenLabs/OpenAI audio too)
+  stopAllAudio();
   if(mic.on){try{mic.rec&&mic.rec.stop();}catch(e){}mic.on=false;}
+  // v15: stop any active recording
+  if(repAudioRecorder&&repAudioRecorder.state==='recording'){try{repAudioRecorder.stop();}catch(e){}}
+  repAudioChunks=[];
   // Stop timer
   if(sim.timer)clearInterval(sim.timer);
   // Wipe DOM
@@ -1487,6 +1429,21 @@ function removeTyping(ctx){const e=document.getElementById(ctx+'-typing');if(e)e
 let selectedVoice=null;
 let voicesLoaded=false;
 let mic={on:false,rec:null};
+// v15: track active <audio> elements so we can stop them all on reset
+let activeAudioElements=[];
+function stopAllAudio(){
+  if(window.speechSynthesis)window.speechSynthesis.cancel();
+  activeAudioElements.forEach(a=>{try{a.pause();a.src='';}catch(e){}});
+  activeAudioElements=[];
+  isSpeaking=false;
+  removeSpeakingIndicator();
+}
+// v15: rep voice recording state
+let repAudioStream=null;
+let repAudioRecorder=null;
+let repAudioChunks=[];
+let lastRepAudioURL=null;
+let repAudioMode='replay'; // 'replay' = record-and-replay user voice, 'tts' = synthetic
 
 function loadVoices(){
   const voices=window.speechSynthesis.getVoices();
@@ -1509,9 +1466,36 @@ function toggleTTS(who){
 
 async function speakText(txt,who){
   if(!ttsEnabled[who])return;
+  // v15: if this is the rep AND we have a recording of their actual voice, play that
+  if(who==='rep' && lastRepAudioURL){
+    return playRecordedRep();
+  }
   if(ELEVENLABS_KEY){await speakElevenLabs(txt,who);}
   else if(OPENAI_KEY){await speakOpenAI(txt,who);}
   else{speakBrowser(txt,who);}
+}
+
+// v15: replay the user's recorded voice instead of synthetic TTS
+function playRecordedRep(){
+  if(!lastRepAudioURL)return Promise.resolve();
+  return new Promise(resolve=>{
+    isSpeaking=true;
+    showSpeakingIndicator('rep');
+    if(mic.on){try{mic.rec&&mic.rec.stop();}catch(e){}mic.on=false;}
+    const audio=new Audio(lastRepAudioURL);
+    activeAudioElements.push(audio);
+    audio.onended=()=>{
+      isSpeaking=false;removeSpeakingIndicator();
+      activeAudioElements=activeAudioElements.filter(a=>a!==audio);
+      resolve();
+    };
+    audio.onerror=()=>{
+      isSpeaking=false;removeSpeakingIndicator();
+      activeAudioElements=activeAudioElements.filter(a=>a!==audio);
+      resolve();
+    };
+    audio.play().catch(()=>{isSpeaking=false;removeSpeakingIndicator();resolve();});
+  });
 }
 
 async function speakElevenLabs(txt,who){
@@ -1550,8 +1534,9 @@ async function speakElevenLabs(txt,who){
     const blob=await r.blob();
     const url=URL.createObjectURL(blob);
     const audio=new Audio(url);
-    audio.onended=()=>{isSpeaking=false;removeSpeakingIndicator();URL.revokeObjectURL(url);};
-    audio.onerror=()=>{isSpeaking=false;removeSpeakingIndicator();URL.revokeObjectURL(url);};
+    activeAudioElements.push(audio); // v15
+    audio.onended=()=>{isSpeaking=false;removeSpeakingIndicator();URL.revokeObjectURL(url);activeAudioElements=activeAudioElements.filter(a=>a!==audio);};
+    audio.onerror=()=>{isSpeaking=false;removeSpeakingIndicator();URL.revokeObjectURL(url);activeAudioElements=activeAudioElements.filter(a=>a!==audio);};
     await audio.play();
   }catch(e){
     isSpeaking=false;removeSpeakingIndicator();
@@ -1573,8 +1558,9 @@ async function speakOpenAI(txt,who){
     const blob=await r.blob();
     const url=URL.createObjectURL(blob);
     const audio=new Audio(url);
-    audio.onended=()=>{isSpeaking=false;removeSpeakingIndicator();URL.revokeObjectURL(url);};
-    audio.onerror=()=>{isSpeaking=false;removeSpeakingIndicator();};
+    activeAudioElements.push(audio); // v15
+    audio.onended=()=>{isSpeaking=false;removeSpeakingIndicator();URL.revokeObjectURL(url);activeAudioElements=activeAudioElements.filter(a=>a!==audio);};
+    audio.onerror=()=>{isSpeaking=false;removeSpeakingIndicator();activeAudioElements=activeAudioElements.filter(a=>a!==audio);};
     audio.play();
   }catch(e){
     isSpeaking=false;removeSpeakingIndicator();
@@ -1646,16 +1632,51 @@ async function toggleMic(ctx){
   const btn=document.getElementById('simMic');
   const inp=document.getElementById('simInput');
   if(isSpeaking){toast('⏳ Wait for speaking to finish.');return;}
-  if(mic.on){try{mic.rec&&mic.rec.stop();}catch(e){}mic.on=false;btn.classList.remove('listening');return;}
+  if(mic.on){
+    try{mic.rec&&mic.rec.stop();}catch(e){}
+    // v15: stop audio recording too
+    if(repAudioRecorder&&repAudioRecorder.state==='recording'){try{repAudioRecorder.stop();}catch(e){}}
+    mic.on=false;btn.classList.remove('listening');return;
+  }
   if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){toast('🎤 Voice input requires Chrome or Edge.');return;}
-  try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());}
+  // v15: request mic for BOTH transcription AND recording (keep stream alive)
+  let micStream=null;
+  try{micStream=await navigator.mediaDevices.getUserMedia({audio:true});}
   catch(err){
     const msgs={'NotAllowedError':'🚫 Mic blocked — click 🔒 in address bar → Allow Microphone.','NotFoundError':'🎤 No microphone found.'};
     toast(msgs[err.name]||'🎤 Mic error: '+err.message);return;
   }
+  // v15: start MediaRecorder to capture audio for replay
+  repAudioChunks=[];
+  if(window.MediaRecorder && repAudioMode==='replay'){
+    try{
+      repAudioStream=micStream;
+      repAudioRecorder=new MediaRecorder(micStream);
+      repAudioRecorder.ondataavailable=e=>{if(e.data.size>0)repAudioChunks.push(e.data);};
+      repAudioRecorder.onstop=()=>{
+        // Build blob and store URL for replay
+        if(repAudioChunks.length>0){
+          if(lastRepAudioURL){URL.revokeObjectURL(lastRepAudioURL);lastRepAudioURL=null;}
+          const blob=new Blob(repAudioChunks,{type:repAudioRecorder.mimeType||'audio/webm'});
+          lastRepAudioURL=URL.createObjectURL(blob);
+        }
+        // Release the mic stream
+        if(repAudioStream){repAudioStream.getTracks().forEach(t=>t.stop());repAudioStream=null;}
+      };
+      repAudioRecorder.start();
+    }catch(e){
+      console.warn('MediaRecorder failed, falling back to TTS:',e);
+      repAudioRecorder=null;
+      // Release stream since we won't be using it
+      micStream.getTracks().forEach(t=>t.stop());
+    }
+  } else {
+    // No recording: release stream — SpeechRecognition uses its own internal mic
+    micStream.getTracks().forEach(t=>t.stop());
+  }
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   mic.rec=new SR();mic.rec.continuous=true;mic.rec.interimResults=true;mic.rec.lang='en-US';mic.rec.maxAlternatives=1;
-  mic.rec.onstart=()=>{mic.on=true;btn.classList.add('listening');toast('🎤 Listening — tap mic again to stop & send');};
+  mic.rec.onstart=()=>{mic.on=true;btn.classList.add('listening');toast('🎤 Listening + recording — tap mic again to send');};
   let micFinalText = '';
   mic.rec.onresult=e=>{
     let interim='';
@@ -1670,7 +1691,24 @@ async function toggleMic(ctx){
     inp.scrollTop = inp.scrollHeight;
   };
   mic.rec.onerror=e=>{mic.on=false;btn.classList.remove('listening');const msgs={'not-allowed':'🚫 Mic denied.','no-speech':'🎤 No speech detected.','audio-capture':'🎤 No mic found.','aborted':''};const m=msgs[e.error]||'🎤 Error: '+e.error;if(m)toast(m);};
-  mic.rec.onend=()=>{mic.on=false;btn.classList.remove('listening');micFinalText='';if(inp.value.trim())sendSim();};
+  mic.rec.onend=()=>{
+    mic.on=false;btn.classList.remove('listening');micFinalText='';
+    // v15: stop the audio recorder so the blob is ready BEFORE sendSim plays it back
+    if(repAudioRecorder&&repAudioRecorder.state==='recording'){
+      repAudioRecorder.onstop=()=>{
+        if(repAudioChunks.length>0){
+          if(lastRepAudioURL){URL.revokeObjectURL(lastRepAudioURL);lastRepAudioURL=null;}
+          const blob=new Blob(repAudioChunks,{type:repAudioRecorder.mimeType||'audio/webm'});
+          lastRepAudioURL=URL.createObjectURL(blob);
+        }
+        if(repAudioStream){repAudioStream.getTracks().forEach(t=>t.stop());repAudioStream=null;}
+        if(inp.value.trim())sendSim();
+      };
+      try{repAudioRecorder.stop();}catch(e){if(inp.value.trim())sendSim();}
+    } else {
+      if(inp.value.trim())sendSim();
+    }
+  };
   try{mic.rec.start();}catch(e){toast('🎤 Could not start mic: '+e.message);}
 }
 
@@ -1751,6 +1789,7 @@ function downloadSession(format){
     }).join('');
     const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RoofVantage Session — ${date}</title><style>body{font-family:'Helvetica Neue',sans-serif;background:#f5f6f8;margin:0;padding:0;}.wrap{max-width:900px;margin:0 auto;padding:32px 24px;}h1{font-size:28px;color:#003865;margin-bottom:4px;}h2{font-size:16px;font-weight:700;color:#003865;margin:28px 0 12px;padding-bottom:8px;border-bottom:2px solid #ED8800;}.score-box{background:#003865;color:#fff;border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:24px;margin-bottom:24px;}.score-num{font-size:56px;font-weight:800;line-height:1;}.score-info{font-size:14px;opacity:0.85;}.score-grade{font-size:20px;font-weight:700;margin-bottom:4px;}</style></head><body><div class="wrap"><h1>RoofVantage Training Session</h1><p style="color:#888;font-size:13px;margin-bottom:20px;">${date} at ${time}</p><div class="score-box"><div class="score-num">${score}</div><div class="score-info"><div class="score-grade">${grade}</div><div>${summary}</div></div></div><h2>Conversation Transcript</h2><div>${msgHtml}</div><h2>Live Coaching Log</h2><div>${coachHtml}</div></div>
 <!-- Q&A DRAWER (v12) -->
+<div class="qa-backdrop" id="qaBackdrop" onclick="toggleQA()"></div>
 <div class="qa-drawer" id="qaDrawer">
   <div class="qa-hdr">
     <div class="qa-title">❓ Ask the Coach</div>
@@ -2092,6 +2131,18 @@ function formatBubble(text){
 // INIT
 // ══════════════════════════════════════
 loadApiKey();
+
+// v15: if user types instead of using mic, clear the previous recording so TTS is used
+const _simInputEl=document.getElementById('simInput');
+if(_simInputEl){
+  _simInputEl.addEventListener('input',()=>{
+    if(!mic.on && lastRepAudioURL){
+      URL.revokeObjectURL(lastRepAudioURL);
+      lastRepAudioURL=null;
+    }
+  });
+}
+
 document.getElementById('versionBadge').textContent = APP_VERSION;
 </script>
 </body>
