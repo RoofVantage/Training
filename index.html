@@ -684,6 +684,55 @@ body{
   padding:2px 8px;font-family:'DM Sans',sans-serif;
   pointer-events:none;user-select:none;
 }
+
+/* v17: COACHING HISTORY DRAWER */
+.coach-hist-drawer{
+  position:fixed;right:0;top:0;bottom:0;width:400px;
+  background:var(--bg);border-left:1px solid var(--border);
+  box-shadow:-10px 0 30px rgba(0,30,60,0.08);
+  z-index:300;display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform 0.3s ease;
+}
+.coach-hist-drawer.open{transform:translateX(0);}
+@media (max-width: 600px){
+  .coach-hist-drawer{width:100vw;}
+}
+.coach-hist-backdrop{
+  position:fixed;inset:0;background:rgba(0,30,60,0.4);
+  z-index:299;opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.coach-hist-backdrop.show{opacity:1;pointer-events:auto;}
+.coach-hist-hdr{
+  background:var(--navy);padding:14px 18px;display:flex;
+  align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.coach-hist-title{font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;color:#fff;}
+.coach-hist-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.coach-hist-empty{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px;}
+
+/* History card mirrors inline-coach style but full-width within drawer */
+.coach-hist-card{
+  background:#fff;border:1px solid var(--border);
+  border-left:4px solid var(--gold2);
+  border-radius:10px;padding:14px 16px;
+  animation:fadeUp 0.3s ease;
+}
+.coach-hist-card-top{
+  display:flex;align-items:center;gap:12px;
+  padding-bottom:10px;border-bottom:1px solid var(--border);
+  margin-bottom:10px;
+}
+.coach-hist-exchange-num{
+  font-size:10px;color:var(--muted);letter-spacing:1px;
+  text-transform:uppercase;font-weight:700;margin-bottom:6px;
+}
+.btn-coach-hist-toggle{
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  color:rgba(255,255,255,0.6);padding:6px 10px;border-radius:6px;
+  font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:0.2s;white-space:nowrap;
+}
 </style>
 
 </head>
@@ -797,6 +846,7 @@ body{
         <div style="display:flex;align-items:center;gap:6px;">
           <button id="simCustTtsBtn" onclick="toggleTTS('cust')" title="Read customer responses aloud" class="tts-toggle-btn tts-on">🔊 Customer</button>
           <button id="simRepTtsBtn"  onclick="toggleTTS('rep')"  title="Read your responses aloud"    class="tts-toggle-btn">🔇 You</button>
+          <button id="coachHistBtn" onclick="toggleCoachHistory()" title="Show coaching history panel" class="tts-toggle-btn">📋 History</button>
           <button class="btn-reset-conv" onclick="resetConversation()" title="Erase chat and coaching but keep current scenario">↺ Reset</button>
           <button class="btn-end" onclick="endSim()">End & Score</button>
         </div>
@@ -1011,7 +1061,7 @@ const STAGES = ["Introduction","Industry Stats","Company Types","Credentials","P
 // ══════════════════════════════════════
 // APP VERSION (single source of truth — bump on every release)
 // ══════════════════════════════════════
-const APP_VERSION = 'v16';
+const APP_VERSION = 'v17';
 
 // ══════════════════════════════════════
 // STATE
@@ -1164,16 +1214,17 @@ function autoFormat(html){
   return html; // short response stays as-is
 }
 
-// v16: Combined inline coaching card — appears directly under rep message in chat
+// v16: Combined inline coaching card — v17: also mirrors into history drawer
 function showExchangeScore(ctx,raw,exchangeId){
   try{
     const d=JSON.parse((raw||'').replace(/```json|```/g,'').trim());
     const container=document.getElementById('simMsgs');
     const gc=gradeColor(d.grade||'C');
+    const better = d.optimal_answer ? `<div class="inline-coach-better-lbl">💡 Better Answer</div><div class="inline-coach-better">${escHtml(d.optimal_answer)}</div>` : '';
+    // Inline card in chat
     const div=document.createElement('div');
     div.className='inline-coach';
     if(exchangeId)div.dataset.exchangeId=exchangeId;
-    const better = d.optimal_answer ? `<div class="inline-coach-better-lbl">💡 Better Answer</div><div class="inline-coach-better">${escHtml(d.optimal_answer)}</div>` : '';
     div.innerHTML=`<div class="inline-coach-top">
       <div class="inline-coach-grade ${gc}">${d.grade||'C'}</div>
       <div class="inline-coach-meta">
@@ -1184,10 +1235,38 @@ function showExchangeScore(ctx,raw,exchangeId){
     <div class="inline-coach-tip">${escHtml(d.tip||'')}</div>
     ${better}`;
     container.appendChild(div);container.scrollTop=container.scrollHeight;
+    // v17: also push a matching card into the history drawer
+    addHistoryCard(d,exchangeId);
     if(d.grade)sim.grades.push(d.grade);
     sim.coachLog = sim.coachLog || [];
     sim.coachLog.push({grade:d.grade||'C',score:d.score,tip:d.tip||'',stage:d.stage||'—',optimal:d.optimal_answer||'',exchange:sim.exch,exchangeId});
   }catch(e){}
+}
+
+// v17: Mirror each coaching card into the history drawer
+function addHistoryCard(d,exchangeId){
+  const body=document.getElementById('coachHistBody');
+  if(!body)return;
+  // Remove empty state on first card
+  const empty=body.querySelector('.coach-hist-empty');
+  if(empty)empty.remove();
+  const gc=gradeColor(d.grade||'C');
+  const better = d.optimal_answer ? `<div class="inline-coach-better-lbl">💡 Better Answer</div><div class="inline-coach-better">${escHtml(d.optimal_answer)}</div>` : '';
+  const card=document.createElement('div');
+  card.className='coach-hist-card';
+  if(exchangeId)card.dataset.exchangeId=exchangeId;
+  card.innerHTML=`<div class="coach-hist-exchange-num">Exchange ${sim.exch}</div>
+    <div class="coach-hist-card-top">
+      <div class="inline-coach-grade ${gc}">${d.grade||'C'}</div>
+      <div class="inline-coach-meta">
+        <div class="inline-coach-points">${d.score||'—'} pts</div>
+        <div class="inline-coach-stage">📍 ${escHtml(d.stage||'—')}</div>
+      </div>
+    </div>
+    <div class="inline-coach-tip">${escHtml(d.tip||'')}</div>
+    ${better}`;
+  // Newest first
+  body.insertBefore(card,body.firstChild);
 }
 function gradeColor(g){const f=(g||'')[0]?.toUpperCase();return f==='A'?'grade-a':f==='B'?'grade-b':f==='C'?'grade-c':'grade-d';}
 
@@ -1238,6 +1317,16 @@ function toggleQA(){
   if(isOpen){
     setTimeout(()=>document.getElementById('qaInput').focus(),300);
   }
+}
+
+// v17: Coaching history drawer
+function toggleCoachHistory(){
+  const drawer=document.getElementById('coachHistDrawer');
+  const backdrop=document.getElementById('coachHistBackdrop');
+  const btn=document.getElementById('coachHistBtn');
+  const isOpen=drawer.classList.toggle('open');
+  if(backdrop)backdrop.classList.toggle('show',isOpen);
+  if(btn)btn.classList.toggle('tts-on',isOpen);
 }
 
 async function sendQA(){
@@ -1376,6 +1465,9 @@ async function resetConversation(){
   // Wipe DOM
   document.getElementById('simMsgs').innerHTML='';
   document.getElementById('coachFeed').innerHTML='';
+  // v17: clear coaching history drawer
+  const _histBody=document.getElementById('coachHistBody');
+  if(_histBody)_histBody.innerHTML='<div class="coach-hist-empty"><div style="font-size:36px;margin-bottom:10px;">📊</div><div>Your coaching history will appear here as you go. Each response gets a card with grade, tip, and a better answer.</div></div>';
   // v16: re-add the welcome tip as an inline system message
   const _welcomeBubble='<div class="msg-sys"><div class="bubble" style="background:rgba(0,127,163,0.08);color:var(--blue);font-size:13px;font-weight:500;padding:10px 14px;">💡 Conversation reset. Start with your greeting and try again.</div></div>';
   document.getElementById('simMsgs').innerHTML=_welcomeBubble;
@@ -1781,6 +1873,22 @@ function downloadSession(format){
     }).join('');
     const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RoofVantage Session — ${date}</title><style>body{font-family:'Helvetica Neue',sans-serif;background:#f5f6f8;margin:0;padding:0;}.wrap{max-width:900px;margin:0 auto;padding:32px 24px;}h1{font-size:28px;color:#003865;margin-bottom:4px;}h2{font-size:16px;font-weight:700;color:#003865;margin:28px 0 12px;padding-bottom:8px;border-bottom:2px solid #ED8800;}.score-box{background:#003865;color:#fff;border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:24px;margin-bottom:24px;}.score-num{font-size:56px;font-weight:800;line-height:1;}.score-info{font-size:14px;opacity:0.85;}.score-grade{font-size:20px;font-weight:700;margin-bottom:4px;}</style></head><body><div class="wrap"><h1>RoofVantage Training Session</h1><p style="color:#888;font-size:13px;margin-bottom:20px;">${date} at ${time}</p><div class="score-box"><div class="score-num">${score}</div><div class="score-info"><div class="score-grade">${grade}</div><div>${summary}</div></div></div><h2>Conversation Transcript</h2><div>${msgHtml}</div><h2>Live Coaching Log</h2><div>${coachHtml}</div></div>
 <!-- Q&A DRAWER (v12) -->
+
+<!-- v17: COACHING HISTORY DRAWER -->
+<div class="coach-hist-backdrop" id="coachHistBackdrop" onclick="toggleCoachHistory()"></div>
+<div class="coach-hist-drawer" id="coachHistDrawer">
+  <div class="coach-hist-hdr">
+    <div class="coach-hist-title">📋 Coaching History</div>
+    <button class="qa-close" onclick="toggleCoachHistory()">✕</button>
+  </div>
+  <div class="coach-hist-body" id="coachHistBody">
+    <div class="coach-hist-empty">
+      <div style="font-size:36px;margin-bottom:10px;">📊</div>
+      <div>Your coaching history will appear here as you go. Each response gets a card with grade, tip, and a better answer.</div>
+    </div>
+  </div>
+</div>
+
 <div class="qa-backdrop" id="qaBackdrop" onclick="toggleQA()"></div>
 <div class="qa-drawer" id="qaDrawer">
   <div class="qa-hdr">
