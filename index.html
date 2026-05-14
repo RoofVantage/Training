@@ -413,22 +413,62 @@ body{
 .bubble .b-first{font-weight:700;display:block;margin-bottom:3px;}
 .bubble .b-rest{font-weight:400;display:block;}
 
-/* BIGGER COACHING — v12 increased font/padding for readability */
-.coaching-col{width:360px;}
-.c-item{padding:14px 16px;}
-.c-lbl{font-size:12px;margin-bottom:9px;font-weight:700;}
-.c-bullets{gap:7px;}
-.c-bullet{font-size:16px;font-weight:500;line-height:1.65;color:var(--text);}
-.c-stage-tag{font-size:11px;font-weight:600;padding:2px 8px;}
-.coaching-hdr{font-size:11px;letter-spacing:2.5px;padding:14px 18px;}
+/* v16: INLINE COACHING CARD — appears directly under each rep response */
+.inline-coach{
+  align-self:flex-end;
+  max-width:88%;
+  background:#fff;
+  border:1px solid var(--border);
+  border-left:4px solid var(--gold2);
+  border-radius:10px;
+  padding:14px 16px;
+  margin:6px 0 12px 0;
+  animation:fadeUp 0.3s ease;
+  box-shadow:0 1px 3px rgba(0,30,60,0.04);
+}
+.inline-coach-top{
+  display:flex;align-items:center;gap:12px;
+  padding-bottom:10px;border-bottom:1px solid var(--border);
+  margin-bottom:10px;
+}
+.inline-coach-grade{
+  font-family:'Barlow',sans-serif;
+  font-size:32px;font-weight:800;line-height:1;
+  flex-shrink:0;
+}
+.inline-coach-grade.grade-a{color:var(--green);}
+.inline-coach-grade.grade-b{color:var(--gold2);}
+.inline-coach-grade.grade-c{color:var(--amber);}
+.inline-coach-grade.grade-d,.inline-coach-grade.grade-f{color:var(--red);}
+.inline-coach-meta{flex:1;}
+.inline-coach-points{font-size:18px;font-weight:700;color:var(--text);}
+.inline-coach-stage{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}
+.inline-coach-tip{
+  font-size:14px;font-weight:500;color:var(--text2);
+  line-height:1.6;margin-bottom:10px;
+}
+.inline-coach-better-lbl{
+  font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--gold);font-weight:700;margin-bottom:6px;
+}
+.inline-coach-better{
+  font-size:16px;font-weight:700;color:var(--text);
+  line-height:1.65;
+  padding:10px 12px;
+  background:rgba(237,136,0,0.08);
+  border-radius:8px;
+  border-left:3px solid var(--gold2);
+}
 
-/* OPTIMAL ANSWER CARD */
-.c-item.optimal{border-left:3px solid var(--gold2);background:rgba(237,136,0,0.06);}
-.c-lbl.optimal{color:var(--gold);}
-.opt-section{margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);}
-.opt-section-lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-weight:700;}
-.opt-text{font-size:15px;font-weight:500;line-height:1.65;color:var(--text);font-style:italic;}
-.opt-yours{color:var(--text2);font-style:normal;}
+/* v16: Compact stage progress bar in topbar */
+.topbar-stage{display:flex;flex-direction:column;gap:3px;min-width:140px;justify-content:center;}
+.topbar-stage-bar{height:5px;background:rgba(255,255,255,0.18);border-radius:99px;overflow:hidden;}
+.topbar-stage-fill{height:100%;background:var(--gold2);border-radius:99px;width:0%;transition:width 0.4s;}
+.topbar-stage-lbl{font-size:9px;color:rgba(255,255,255,0.65);letter-spacing:0.5px;text-align:center;white-space:nowrap;text-transform:uppercase;}
+
+/* v16: System message styling (the welcome tip) */
+.msg-sys{align-self:center;max-width:80%;margin:8px 0;}
+.msg-sys .bubble{text-align:center;border-radius:8px;}
 
 /* RETRY BUTTON ON YOUR MESSAGES */
 .msg-rep{position:relative;}
@@ -749,6 +789,10 @@ body{
           <div><div class="sstat-val" id="simClock">0:00</div><div class="sstat-lbl">Time</div></div>
           <div><div class="sstat-val" id="simExch">0</div><div class="sstat-lbl">Exchanges</div></div>
           <div><div class="sstat-val" id="simAvgGrade">—</div><div class="sstat-lbl">Avg Grade</div></div>
+          <div class="topbar-stage">
+            <div class="topbar-stage-bar"><div class="topbar-stage-fill" id="stagePctBar"></div></div>
+            <div class="topbar-stage-lbl"><span id="stagePctLabel">0 / 19</span> · <span id="stageCurrentName">Not started</span></div>
+          </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
           <button id="simCustTtsBtn" onclick="toggleTTS('cust')" title="Read customer responses aloud" class="tts-toggle-btn tts-on">🔊 Customer</button>
@@ -758,8 +802,14 @@ body{
         </div>
       </div>
       <div class="sim-body">
-        <div class="sim-chat">
-          <div class="sim-msgs" id="simMsgs"></div>
+        <div class="sim-chat" style="flex:1;width:100%;">
+          <!-- v16: orphaned coachFeed kept as hidden div so addCoachItem etc. don't break -->
+          <div id="coachFeed" style="display:none;"></div>
+          <!-- v16: hidden stage list to preserve toggleStages() etc. -->
+          <div id="stageList" style="display:none;"></div>
+          <div class="sim-msgs" id="simMsgs">
+            <div class="msg-sys"><div class="bubble" style="background:rgba(0,127,163,0.08);color:var(--blue);font-size:13px;font-weight:500;padding:10px 14px;">💡 Start with your greeting — frame this as a team walkthrough, not a sales pitch.</div></div>
+          </div>
           <div class="sim-input">
             <div class="sim-row">
               <textarea class="chat-ta" id="simInput" placeholder="Respond to the customer…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendSim();}"></textarea>
@@ -767,30 +817,6 @@ body{
               <button class="btn-mic" id="simMic" onclick="toggleMic('sim')" title="Voice input">🎤</button>
               <button class="btn-send" id="simSend" onclick="sendSim()">➤</button>
             </div>
-          </div>
-        </div>
-        <div class="coaching-col">
-          <div class="coaching-hdr">🧠 Live Coaching</div>
-          <div class="coaching-feed" id="coachFeed">
-            <div class="c-item tip">
-              <div class="c-lbl tip">Tip</div>
-              <ul class="c-bullets"><li class="c-bullet"><span>Start with your greeting — frame this as a team walkthrough, not a sales pitch.</span></li></ul>
-            </div>
-          </div>
-          <div class="stage-panel">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-              <div class="stage-ttl" style="margin-bottom:0;">Script Coverage</div>
-              <button onclick="toggleStages()" id="stageToggleBtn" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 4px;">▸ Show</button>
-            </div>
-            <div style="height:6px;background:#eef0f4;border-radius:99px;overflow:hidden;margin-bottom:5px;">
-              <div id="stagePctBar" style="height:100%;background:var(--gold2);border-radius:99px;width:0%;transition:width 0.4s;"></div>
-            </div>
-            <div class="stage-current-label" id="stageCurrentLabel">
-              <div class="stage-current-dot"></div>
-              <span id="stageCurrentName">Not started</span>
-              <span style="color:var(--muted);font-weight:400;margin-left:auto;" id="stagePctLabel">0 / 19</span>
-            </div>
-            <div id="stageList" style="display:none;margin-top:8px;"></div>
           </div>
         </div>
       </div>
@@ -985,7 +1011,7 @@ const STAGES = ["Introduction","Industry Stats","Company Types","Credentials","P
 // ══════════════════════════════════════
 // APP VERSION (single source of truth — bump on every release)
 // ══════════════════════════════════════
-const APP_VERSION = 'v15';
+const APP_VERSION = 'v16';
 
 // ══════════════════════════════════════
 // STATE
@@ -1041,13 +1067,7 @@ function buildStages(){
   });
   updateStageBar();
 }
-function toggleStages(){
-  const list=document.getElementById('stageList');
-  const btn=document.getElementById('stageToggleBtn');
-  const open=list.style.display==='block';
-  list.style.display=open?'none':'block';
-  btn.textContent=open?'▸ Show':'▴ Hide';
-}
+function toggleStages(){ /* v16: no-op - stage list panel removed */ }
 function updateStageBar(){
   const pct=Math.round(sim.stages.size/STAGES.length*100);
   document.getElementById('stagePctBar').style.width=pct+'%';
@@ -1144,68 +1164,37 @@ function autoFormat(html){
   return html; // short response stays as-is
 }
 
+// v16: Combined inline coaching card — appears directly under rep message in chat
 function showExchangeScore(ctx,raw,exchangeId){
   try{
     const d=JSON.parse((raw||'').replace(/```json|```/g,'').trim());
     const container=document.getElementById('simMsgs');
     const gc=gradeColor(d.grade||'C');
     const div=document.createElement('div');
-    div.className='exchange-score';
+    div.className='inline-coach';
     if(exchangeId)div.dataset.exchangeId=exchangeId;
-    div.innerHTML=`<div class="es-top">
-      <div><div class="es-label">Response Grade</div><div class="es-grade ${gc}">${d.grade||'C'}</div></div>
-      <div style="text-align:right"><div class="es-label">Score</div><div class="es-points">${d.score||'—'} pts</div></div>
+    const better = d.optimal_answer ? `<div class="inline-coach-better-lbl">💡 Better Answer</div><div class="inline-coach-better">${escHtml(d.optimal_answer)}</div>` : '';
+    div.innerHTML=`<div class="inline-coach-top">
+      <div class="inline-coach-grade ${gc}">${d.grade||'C'}</div>
+      <div class="inline-coach-meta">
+        <div class="inline-coach-points">${d.score||'—'} pts</div>
+        <div class="inline-coach-stage">📍 ${escHtml(d.stage||'—')}</div>
+      </div>
     </div>
-    <div class="es-tip">${escHtml(d.tip||'')}</div>
-    <div class="es-stage">📍 Stage: ${escHtml(d.stage||'—')}</div>`;
+    <div class="inline-coach-tip">${escHtml(d.tip||'')}</div>
+    ${better}`;
     container.appendChild(div);container.scrollTop=container.scrollHeight;
     if(d.grade)sim.grades.push(d.grade);
     sim.coachLog = sim.coachLog || [];
-    sim.coachLog.push({grade:d.grade||'C',score:d.score,tip:d.tip||'',stage:d.stage||'—',exchange:sim.exch,exchangeId});
+    sim.coachLog.push({grade:d.grade||'C',score:d.score,tip:d.tip||'',stage:d.stage||'—',optimal:d.optimal_answer||'',exchange:sim.exch,exchangeId});
   }catch(e){}
 }
 function gradeColor(g){const f=(g||'')[0]?.toUpperCase();return f==='A'?'grade-a':f==='B'?'grade-b':f==='C'?'grade-c':'grade-d';}
 
-function addCoachItem(raw,exchangeId){
-  try{
-    const d=JSON.parse((raw||'').replace(/```json|```/g,'').trim());
-    const feed=document.getElementById('coachFeed');
-    const q=(d.grade||'C')[0]?.toUpperCase();
-    const cls=q==='A'?'good':q==='B'?'tip':q==='C'?'warn':'bad';
-    const lbl={good:'✅ Excellent',tip:'👍 Good',warn:'⚠️ Improve',bad:'❌ Missed'}[cls];
-    const tips=(d.tip||'').split(/(?<=[.!?])\s+/).filter(s=>s.trim().length>2);
-    const bullets=tips.map(t=>`<li class="c-bullet"><span>${escHtml(t.trim())}</span></li>`).join('');
-    const item=document.createElement('div');
-    item.className=`c-item ${cls}`;
-    if(exchangeId)item.dataset.exchangeId=exchangeId;
-    item.innerHTML=`<div class="c-lbl ${cls}">${lbl}</div>
-      <ul class="c-bullets">${bullets||`<li class="c-bullet"><span>${escHtml(d.tip||'')}</span></li>`}</ul>
-      ${d.stage?`<div class="c-stage-tag">📍 ${escHtml(d.stage)}</div>`:''}`;
-    feed.insertBefore(item,feed.firstChild);
-  }catch(e){}
-}
-
-// v12: Add optimal answer card showing rep's response side-by-side with improved version
-function addOptimalAnswerCard(raw,yourAnswer,exchangeId){
-  try{
-    const d=JSON.parse((raw||'').replace(/```json|```/g,'').trim());
-    if(!d.optimal_answer)return;
-    const feed=document.getElementById('coachFeed');
-    const item=document.createElement('div');
-    item.className='c-item optimal';
-    if(exchangeId)item.dataset.exchangeId=exchangeId;
-    item.innerHTML=`<div class="c-lbl optimal">💡 Better Answer</div>
-      <div class="opt-section" style="border-top:none;padding-top:0;margin-top:0;">
-        <div class="opt-section-lbl">Your Response</div>
-        <div class="opt-text opt-yours">${escHtml(yourAnswer)}</div>
-      </div>
-      <div class="opt-section">
-        <div class="opt-section-lbl">Improved Version</div>
-        <div class="opt-text">${escHtml(d.optimal_answer)}</div>
-      </div>`;
-    feed.insertBefore(item,feed.firstChild);
-  }catch(e){}
-}
+// v16: addCoachItem and addOptimalAnswerCard merged into showExchangeScore (inline card)
+// These remain as no-ops so call sites in sendSim continue to function.
+function addCoachItem(raw,exchangeId){ /* v16: handled inline in showExchangeScore */ }
+function addOptimalAnswerCard(raw,yourAnswer,exchangeId){ /* v16: handled inline in showExchangeScore */ }
 
 
 
@@ -1359,7 +1348,7 @@ function resetSim(){
   document.getElementById('simActive').classList.remove('on');
   document.getElementById('simSetup').style.display='';
   document.getElementById('simMsgs').innerHTML='';
-  document.getElementById('coachFeed').innerHTML='<div class="c-item tip"><div class="c-lbl tip">Tip</div><ul class="c-bullets"><li class="c-bullet"><span>Start with your greeting — frame this as a team walkthrough, not a sales pitch.</span></li></ul></div>';
+  document.getElementById('coachFeed').innerHTML='';
   document.getElementById('simClock').textContent='0:00';
   document.getElementById('simExch').textContent='0';
   document.getElementById('simAvgGrade').textContent='—';
@@ -1386,7 +1375,10 @@ async function resetConversation(){
   if(sim.timer)clearInterval(sim.timer);
   // Wipe DOM
   document.getElementById('simMsgs').innerHTML='';
-  document.getElementById('coachFeed').innerHTML='<div class="c-item tip"><div class="c-lbl tip">Tip</div><ul class="c-bullets"><li class="c-bullet"><span>Conversation reset. Start with your greeting and try again.</span></li></ul></div>';
+  document.getElementById('coachFeed').innerHTML='';
+  // v16: re-add the welcome tip as an inline system message
+  const _welcomeBubble='<div class="msg-sys"><div class="bubble" style="background:rgba(0,127,163,0.08);color:var(--blue);font-size:13px;font-weight:500;padding:10px 14px;">💡 Conversation reset. Start with your greeting and try again.</div></div>';
+  document.getElementById('simMsgs').innerHTML=_welcomeBubble;
   document.getElementById('simExch').textContent='0';
   document.getElementById('simClock').textContent='0:00';
   document.getElementById('simAvgGrade').textContent='—';
